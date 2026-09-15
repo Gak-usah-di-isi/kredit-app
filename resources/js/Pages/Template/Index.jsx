@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { RotateCcw, UserPlus, Users } from 'lucide-react';
-import IcasveSidebar from '../layout/IcasveSidebar';
-import IcasveTopbar from '../layout/IcasveTopbar';
+import KreditAppSidebar from '../layout/KreditAppSidebar';
+import KreditAppTopbar from '../layout/KreditAppTopbar';
 import MetricCard from './components/MetricCard';
 import MySchedule from './components/MySchedule';
 import MyConsultationTime from './components/MyConsultationTime';
@@ -13,7 +13,7 @@ export default function TemplatePage() {
 
   return (
     <div className="flex w-full h-screen overflow-hidden bg-[#F4F7FB]">
-      <IcasveSidebar
+      <KreditAppSidebar
         isMobileOpen={isMobileSidebarOpen}
         onMobileClose={() => setIsMobileSidebarOpen(false)}
         onStandByMode={() => {}}
@@ -21,7 +21,7 @@ export default function TemplatePage() {
       />
 
       <div className="flex flex-col flex-1 w-full h-screen overflow-hidden">
-        <IcasveTopbar onMobileMenuClick={() => setIsMobileSidebarOpen(true)} />
+        <KreditAppTopbar onMobileMenuClick={() => setIsMobileSidebarOpen(true)} />
 
         <div className="flex-1 overflow-y-auto bg-[#F4F7FB]">
           <div className="p-4 lg:p-6">

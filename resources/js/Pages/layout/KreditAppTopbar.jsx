@@ -1,4 +1,5 @@
 import { Icon } from '@iconify/react';
+import { usePage, router } from '@inertiajs/react';
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -9,25 +10,29 @@ import {
 import { Avatar, AvatarImage, AvatarFallback } from '../../Components/ui/avatar';
 import { useTheme } from '../../Components/ui/shared/ThemeContext';
 
-export default function IcasveTopbar({ onMobileMenuClick }) {
+const PARTICIPANT_ROLES = ['indonesia-presenter', 'foreign-presenter', 'indonesia-participants', 'foreign-participants'];
+
+export default function KreditAppTopbar({ onMobileMenuClick }) {
   const { dark, toggle } = useTheme();
+  const { auth, authUser, authRoles } = usePage().props;
+
+  const user = authUser || auth?.user;
+  const roles = authRoles || (user?.roles ? user.roles.map(r => r.name) : []);
+
+  const userName    = user?.name ?? 'User';
+  const userEmail   = user?.email ?? '';
+  const userInitial = userName.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase();
+  const userRole    = roles?.[0]
+    ? roles[0].replace(/[-_]/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
+    : 'Nasabah';
+  const isNasabah   = roles.includes('nasabah') || roles.length === 0;
+  const isParticipant = (roles ?? []).some(r => PARTICIPANT_ROLES.includes(r));
 
   const bar  = dark ? '#1E293B' : '#ffffff';
   const bord = dark ? '#334155' : '#e5e7eb';
   const text  = dark ? '#E2E8F0' : '#374151';
   const sub   = dark ? '#94A3B8' : '#6B7280';
   const hover = dark ? 'rgba(255,255,255,0.06)' : '#F9FAFB';
-
-  const HoverBtn = ({ children, ...props }) => (
-    <button
-      {...props}
-      style={{ background: 'transparent', ...props.style }}
-      onMouseEnter={e => e.currentTarget.style.background = hover}
-      onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
-    >
-      {children}
-    </button>
-  );
 
   return (
     <div
@@ -46,55 +51,15 @@ export default function IcasveTopbar({ onMobileMenuClick }) {
           <Icon icon="solar:hamburger-menu-line-duotone" height={24} />
         </button>
 
-        {/* View dropdown */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <button
-              className="hidden lg:flex items-center gap-2 transition-colors rounded-lg px-2 py-1.5"
-              style={{ color: sub }}
-              onMouseEnter={e => { e.currentTarget.style.background = hover; e.currentTarget.style.color = text; }}
-              onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = sub; }}
-            >
-              <Icon icon="solar:user-circle-outline" width={20} style={{ color: sub }} />
-              <span className="text-sm" style={{ color: text }}>Super Admin View</span>
-              <Icon icon="solar:alt-arrow-down-outline" width={16} style={{ color: sub }} />
-            </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start">
-            <DropdownMenuItem>
-              <Icon icon="solar:user-circle-outline" className="mr-2" width={16} />
-              Super Admin View
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Icon icon="solar:user-outline" className="mr-2" width={16} />
-              Doctor View
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Icon icon="solar:users-group-rounded-outline" className="mr-2" width={16} />
-              Staff View
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        {/* View label (static, no dropdown) */}
+        <div className="hidden lg:flex items-center gap-2 rounded-lg px-2 py-1.5" style={{ color: sub }}>
+          <Icon icon="solar:compass-outline" width={20} style={{ color: sub }} />
+          <span className="text-sm" style={{ color: text }}>Dashboard View</span>
+        </div>
       </div>
 
       {/* Right */}
       <div className="flex items-center gap-1">
-
-        {/* Dark / Light toggle */}
-        <button
-          onClick={toggle}
-          title={dark ? 'Switch to Light mode' : 'Switch to Dark mode'}
-          className="h-9 w-9 flex items-center justify-center rounded-lg transition-colors"
-          style={{ color: dark ? '#FACC15' : '#6B7280' }}
-          onMouseEnter={e => e.currentTarget.style.background = hover}
-          onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
-        >
-          <Icon
-            icon={dark ? 'solar:sun-bold-duotone' : 'solar:moon-bold-duotone'}
-            width={20}
-          />
-        </button>
-
         {/* Notifications */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -142,47 +107,49 @@ export default function IcasveTopbar({ onMobileMenuClick }) {
           </DropdownMenuContent>
         </DropdownMenu>
 
-        {/* Settings */}
-        <a
-          href="/template/pengaturan"
-          className="h-9 w-9 flex items-center justify-center rounded-lg transition-colors"
-          style={{ color: sub }}
-          aria-label="Settings"
-          onMouseEnter={e => e.currentTarget.style.background = hover}
-          onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
-        >
-          <Icon icon="solar:settings-outline" width={20} />
-        </a>
+        {/* Settings (sembunyikan untuk role nasabah) */}
+        {!isNasabah && (
+          <a
+            href="/template/pengaturan"
+            className="h-9 w-9 flex items-center justify-center rounded-lg transition-colors"
+            style={{ color: sub }}
+            aria-label="Settings"
+            onMouseEnter={e => e.currentTarget.style.background = hover}
+            onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+          >
+            <Icon icon="solar:settings-outline" width={20} />
+          </a>
+        )}
 
         {/* Profile */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button
-              className="flex items-center gap-3 rounded-lg px-2 py-1.5 transition-colors ml-1"
+              className="flex items-center gap-3 rounded-lg px-2 py-1.5 transition-colors ml-1 cursor-pointer"
               onMouseEnter={e => e.currentTarget.style.background = hover}
               onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
             >
               <div className="hidden md:block text-right">
-                <div className="text-sm font-medium" style={{ color: text }}>Anas Khalif Muttaqien</div>
-                <div className="text-xs" style={{ color: sub }}>Super Admin</div>
+                <div className="text-sm font-medium" style={{ color: text }}>{userName}</div>
+                <div className="text-xs" style={{ color: sub }}>{userRole}</div>
               </div>
               <Avatar className="w-9 h-9">
-                <AvatarImage src="https://picsum.photos/seed/admin/200" alt="Admin" />
-                <AvatarFallback className="bg-blue-600 text-white text-sm">AK</AvatarFallback>
+                <AvatarFallback className="bg-blue-600 text-white text-sm">{userInitial}</AvatarFallback>
               </Avatar>
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <div className="px-4 py-3 border-b border-gray-100">
-              <p className="text-sm font-medium text-gray-900">Anas Khalif Muttaqien</p>
-              <p className="text-xs text-gray-500 mt-0.5">Super Admin</p>
+              <p className="text-sm font-medium text-gray-900">{userName}</p>
+              <p className="text-xs text-gray-500 mt-0.5">{userRole}</p>
+              {userEmail && <p className="text-xs text-gray-400 mt-0.5">{userEmail}</p>}
             </div>
             <DropdownMenuItem>
               <Icon icon="solar:user-outline" className="mr-2" width={16} />
               Profile
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-red-600">
+            <DropdownMenuItem className="text-red-600" onClick={() => router.post('/logout')}>
               <Icon icon="solar:logout-2-outline" className="mr-2" width={16} />
               Sign Out
             </DropdownMenuItem>

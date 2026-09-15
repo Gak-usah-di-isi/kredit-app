@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { ChevronLeft, ChevronRight, Bell } from 'lucide-react';
-import IcasveSidebar from '../layout/IcasveSidebar';
-import IcasveTopbar from '../layout/IcasveTopbar';
+import KreditAppSidebar from '../layout/KreditAppSidebar';
+import KreditAppTopbar from '../layout/KreditAppTopbar';
 import OmzetCard from './business/OmzetCard';
 import OmzetTrendCard from './business/OmzetTrendCard';
 import TopDoctor from './business/TopDoctor';
@@ -71,7 +71,7 @@ export default function BusinessPage() {
 
   return (
     <div className="flex w-full h-screen overflow-hidden bg-[#F4F7FB]">
-      <IcasveSidebar
+      <KreditAppSidebar
         isMobileOpen={isMobileSidebarOpen}
         onMobileClose={() => setIsMobileSidebarOpen(false)}
         onStandByMode={() => {}}
@@ -79,7 +79,7 @@ export default function BusinessPage() {
       />
 
       <div className="flex flex-col flex-1 w-full h-screen overflow-hidden">
-        <IcasveTopbar onMobileMenuClick={() => setIsMobileSidebarOpen(true)} />
+        <KreditAppTopbar onMobileMenuClick={() => setIsMobileSidebarOpen(true)} />
 
         <div className="flex-1 overflow-y-auto bg-[#F4F7FB]">
           <div className="p-4 lg:p-6">

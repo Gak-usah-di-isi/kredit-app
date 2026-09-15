@@ -33,7 +33,7 @@ import {
 } from '../../Components/ui/dropdown-menu';
 import { useTheme } from "../../Components/ui/shared/ThemeContext";
 
-export default function IcasveSidebar({
+export default function KreditAppSidebar({
   isMobileOpen = false,
   onMobileClose,
   onStandByMode,
@@ -63,7 +63,8 @@ export default function IcasveSidebar({
         if (hasActiveChild && item.heading) activeHeading = item.heading;
       });
     });
-    setExpandedSections(new Set([activeHeading ?? 'DASHBOARD']));
+    const defaultHeading = menuItems[0]?.items?.[0]?.heading ?? 'DASHBOARD';
+    setExpandedSections(new Set([activeHeading ?? defaultHeading]));
   }, [currentPath, menuItems]);
 
   const handleSectionToggle = (heading) => {
@@ -93,84 +94,38 @@ export default function IcasveSidebar({
     <>
       {/* Logo */}
       <div className="h-[64px] px-6 flex items-center justify-center" style={{ borderBottom: `1px solid ${bord}` }}>
-        <img src={logoPath || '/images/logo.png'} alt="ICASVE" className="h-9 w-auto object-contain" />
+        <img src={logoPath || '/images/logo.png'} alt="Kredit App" className="h-9 w-auto object-contain" />
       </div>
 
-      {/* Clinic Selector */}
+      {/* Account Status (Opsi 1) */}
       <div className="px-4 pt-4 pb-1">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <button
-              className="w-full rounded-md p-3 py-2.5 transition-colors w-full"
-              style={{ background: clinicBg, border: `1px solid ${clinicBord}` }}
-              onMouseEnter={e => e.currentTarget.style.background = hover}
-              onMouseLeave={e => e.currentTarget.style.background = clinicBg}
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div
-                    className="w-6 h-6 rounded-lg flex items-center justify-center"
-                    style={{ background: isArchiveMode ? '#D97706' : '#0152EA' }}
-                  >
-                    <Icon icon="solar:calendar-mark-line-duotone" className="text-white" width={14} />
-                  </div>
-                  <div className="flex flex-col text-left">
-                    <span className="text-sm font-medium" style={{ color: text }}>
-                      {shownYear ? `ICASVE ${shownYear}` : 'Tidak ada Tahun Aktif'}
-                    </span>
-                    <span className="text-xs" style={{ color: isArchiveMode ? '#D97706' : sub }}>
-                      {!shownYear
-                        ? 'Silahkan set tahun aktif'
-                        : isArchiveMode
-                          ? 'Arsip — hanya lihat'
-                          : 'Tahun aktif'}
-                    </span>
-                  </div>
-                </div>
-                <Icon icon="solar:alt-arrow-down-line-duotone" width={16} style={{ color: sub }} />
+        <div
+          className="w-full rounded-xl p-3 py-2.5 transition-colors"
+          style={{ background: clinicBg, border: `1px solid ${clinicBord}` }}
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div
+                className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0"
+                style={{ background: '#0152EA' }}
+              >
+                <Icon icon="solar:shield-check-bold-duotone" className="text-white" width={16} />
               </div>
-            </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="w-[223px]" sideOffset={8}>
-            {canSwitchYear ? (
-              <div className="py-1">
-                <div className="px-3 pt-1 pb-2 text-xs font-semibold uppercase tracking-wide text-gray-400">
-                  Pilih tahun
-                </div>
-                {availableYears.map((year) => {
-                  const isCurrent = year === viewingYear;
-                  const isActive = year === activeYear?.year;
-                  return (
-                    <button
-                      key={year}
-                      type="button"
-                      onClick={() => handleYearChange(year)}
-                      className="w-full flex items-center justify-between px-3 py-2 text-sm transition-colors"
-                      style={{
-                        background: isCurrent ? 'rgba(1,82,234,0.08)' : 'transparent',
-                        color: isCurrent ? '#0152EA' : '#374151',
-                        fontWeight: isCurrent ? 600 : 400,
-                        border: 'none',
-                        cursor: 'pointer',
-                      }}
-                      onMouseEnter={e => { if (!isCurrent) e.currentTarget.style.background = '#F0F5FF'; }}
-                      onMouseLeave={e => { if (!isCurrent) e.currentTarget.style.background = 'transparent'; }}
-                    >
-                      <span>ICASVE {year}</span>
-                      <span className="text-xs" style={{ color: isActive ? '#10B981' : '#9CA3AF' }}>
-                        {isActive ? 'aktif' : 'arsip'}
-                      </span>
-                    </button>
-                  );
-                })}
+              <div className="flex flex-col text-left">
+                <span className="text-sm font-semibold leading-tight" style={{ color: text }}>
+                  Akun Nasabah
+                </span>
+                <span className="text-xs flex items-center gap-1 font-medium mt-0.5 text-emerald-600">
+                  <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                  Terverifikasi
+                </span>
               </div>
-            ) : (
-              <div className="p-3 text-sm text-gray-500">
-                {activeYear ? `Tahun aktif ${activeYear.year}` : 'Belum ada tahun aktif'}
-              </div>
-            )}
-          </DropdownMenuContent>
-        </DropdownMenu>
+            </div>
+            <span className="text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded bg-blue-50 text-blue-600 border border-blue-100">
+              Aktif
+            </span>
+          </div>
+        </div>
       </div>
 
       {/* Nav Items */}
@@ -276,7 +231,7 @@ export default function IcasveSidebar({
             style={{ background: bg, borderRight: `1px solid ${bord}` }}
           >
             <div className="p-4 flex items-center justify-between" style={{ borderBottom: `1px solid ${bord}` }}>
-              <img src={logoPath || '/images/logo.png'} alt="ICASVE" className="h-8 w-auto object-contain" />
+              <img src={logoPath || '/images/logo.png'} alt="Kredit App" className="h-8 w-auto object-contain" />
               <button
                 onClick={onMobileClose}
                 className="p-1 rounded"

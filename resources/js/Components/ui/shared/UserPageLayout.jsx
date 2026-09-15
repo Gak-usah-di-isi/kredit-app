@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { usePage, router } from '@inertiajs/react';
 import { Icon } from '@iconify/react';
 import { ThemeProvider, useTheme } from './ThemeContext';
-import IcasveSidebar from '../../../Pages/layout/IcasveSidebar';
-import IcasveTopbar from '../../../Pages/layout/IcasveTopbar';
+import KreditAppSidebar from '../../../Pages/layout/KreditAppSidebar';
+import KreditAppTopbar from '../../../Pages/layout/KreditAppTopbar';
 import SidebarContentUser from '../../../Pages/layout/SidebarItemsUser';
 
 const PRESENTER_ROLES = ['indonesia-presenter', 'foreign-presenter'];
@@ -24,7 +24,7 @@ function Layout({ currentPath, children }) {
       className="flex w-full h-screen overflow-hidden"
       style={{ background: dark ? '#0F172A' : '#F4F7FB' }}
     >
-      <IcasveSidebar
+      <KreditAppSidebar
         isMobileOpen={isMobileSidebarOpen}
         onMobileClose={() => setIsMobileSidebarOpen(false)}
         onStandByMode={() => {}}
@@ -32,7 +32,7 @@ function Layout({ currentPath, children }) {
         items={SidebarContentUser(showAbstract)}
       />
       <div className="flex flex-col flex-1 w-full h-screen overflow-hidden">
-        <IcasveTopbar onMobileMenuClick={() => setIsMobileSidebarOpen(true)} />
+        <KreditAppTopbar onMobileMenuClick={() => setIsMobileSidebarOpen(true)} />
         <div
           className="flex-1 overflow-y-auto"
           style={{ background: dark ? '#0F172A' : '#F4F7FB' }}
