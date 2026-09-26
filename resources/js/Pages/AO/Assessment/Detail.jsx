@@ -58,6 +58,30 @@ export default function Detail({
 
     const score = assessment.score;
     const flag = assessment.flag;
+
+    const formatCompletionTime = (sec) => {
+        if (sec === null || sec === undefined || sec === '') return '-';
+        const totalSeconds = Math.abs(parseInt(sec, 10));
+        if (isNaN(totalSeconds)) return '-';
+
+        if (totalSeconds < 60) {
+            return `${totalSeconds} detik`;
+        }
+
+        const hours = Math.floor(totalSeconds / 3600);
+        const minutes = Math.floor((totalSeconds % 3600) / 60);
+        const remainingSeconds = totalSeconds % 60;
+
+        if (hours > 0) {
+            return remainingSeconds > 0
+                ? `${hours} jam ${minutes} mnt ${remainingSeconds} dtk`
+                : `${hours} jam ${minutes} menit`;
+        }
+
+        return remainingSeconds > 0
+            ? `${minutes} menit ${remainingSeconds} detik`
+            : `${minutes} menit`;
+    };
     const decision = assessment.decision;
     const outcome = assessment.outcome_monitoring;
     const responses = assessment.responses || [];
@@ -504,7 +528,7 @@ export default function Detail({
                                     </div>
                                     <div className="p-3 bg-gray-50 rounded-lg">
                                         <div className="text-xs text-gray-500">Waktu Pengisian</div>
-                                        <div className="font-bold text-gray-900 mt-0.5">{flag?.completion_time_sec ? `${flag.completion_time_sec} detik` : '-'}</div>
+                                        <div className="font-bold text-gray-900 mt-0.5">{formatCompletionTime(flag?.completion_time_sec)}</div>
                                     </div>
                                 </div>
                             </div>

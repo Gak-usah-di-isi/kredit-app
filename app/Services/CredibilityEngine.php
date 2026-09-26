@@ -62,7 +62,7 @@ class CredibilityEngine
         $completionTime = null;
         $timingFlag = false;
         if ($assessment->start_time && $assessment->submit_time) {
-            $completionTime = $assessment->submit_time->diffInSeconds($assessment->start_time);
+            $completionTime = (int) abs($assessment->start_time->diffInSeconds($assessment->submit_time));
             // Example hardcoded threshold for timing: less than 17 seconds (1 sec/item)
             if ($completionTime < 17) {
                 $timingFlag = true;
