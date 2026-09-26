@@ -1,6 +1,26 @@
 import React, { useState } from 'react';
 import { Head, router } from '@inertiajs/react';
 
+const SCALE_LABELS = {
+    1: 'Sangat Tidak Setuju',
+    2: 'Tidak Setuju',
+    3: 'Agak Tidak Setuju',
+    4: 'Netral',
+    5: 'Agak Setuju',
+    6: 'Setuju',
+    7: 'Sangat Setuju',
+};
+
+const SCALE_COLORS = {
+    1: 'text-rose-600 bg-rose-50 border-rose-200',
+    2: 'text-orange-600 bg-orange-50 border-orange-200',
+    3: 'text-amber-600 bg-amber-50 border-amber-200',
+    4: 'text-slate-600 bg-slate-50 border-slate-200',
+    5: 'text-teal-600 bg-teal-50 border-teal-200',
+    6: 'text-blue-600 bg-blue-50 border-blue-200',
+    7: 'text-emerald-600 bg-emerald-50 border-emerald-200',
+};
+
 export default function Form({ assessment, items }) {
     // State jawaban: item_code => nilai 1-7
     const [answers, setAnswers] = useState({});
@@ -56,9 +76,33 @@ export default function Form({ assessment, items }) {
                         </div>
                     </div>
 
-                    <p className="text-xs sm:text-sm text-gray-600 leading-relaxed bg-blue-50/60 p-4 rounded-xl border border-blue-100">
-                        <strong>Petunjuk Pengisian:</strong> Bacalah setiap butir pernyataan di bawah ini dengan seksama. Berikan nilai dari <strong>1 (Sangat Tidak Setuju)</strong> sampai dengan <strong>7 (Sangat Setuju)</strong> sesuai dengan keadaan diri Anda yang sebenarnya.
-                    </p>
+                    <div className="bg-blue-50/60 p-4 sm:p-5 rounded-xl border border-blue-100 space-y-3.5">
+                        <p className="text-xs sm:text-sm text-gray-700 leading-relaxed">
+                            <strong>Petunjuk Pengisian:</strong> Bacalah setiap butir pernyataan di bawah ini dengan seksama. Berikan nilai dari <strong>1</strong> sampai dengan <strong>7</strong> sesuai dengan keadaan diri Anda yang sebenarnya. Tidak ada jawaban yang salah, mohon menjawab dengan jujur dan spontan.
+                        </p>
+
+                        {/* Keterangan Arti Angka 1 s.d. 7 */}
+                        <div className="pt-3 border-t border-blue-200/60">
+                            <div className="text-[11px] font-bold text-blue-950 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                                <span>📋 Keterangan Skala Penilaian:</span>
+                            </div>
+                            <div className="grid grid-cols-2 sm:grid-cols-7 gap-1.5 text-center">
+                                {[1, 2, 3, 4, 5, 6, 7].map((num) => (
+                                    <div
+                                        key={num}
+                                        className="bg-white/90 p-2 rounded-lg border border-blue-100/80 shadow-2xs flex flex-col items-center justify-between"
+                                    >
+                                        <span className={`w-5 h-5 flex items-center justify-center rounded-full text-xs font-black mb-1 ${SCALE_COLORS[num]}`}>
+                                            {num}
+                                        </span>
+                                        <span className="text-[10px] text-gray-700 font-medium leading-tight">
+                                            {SCALE_LABELS[num]}
+                                        </span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 {/* Question List */}
@@ -88,6 +132,7 @@ export default function Form({ assessment, items }) {
                                         <button
                                             type="button"
                                             key={num}
+                                            title={`${num}: ${SCALE_LABELS[num]}`}
                                             onClick={() => handleSelect(item.item_code, num)}
                                             className={`flex flex-col items-center justify-center py-2 sm:py-3 rounded-xl border text-xs sm:text-sm font-bold transition ${
                                                 selectedVal === num
@@ -99,9 +144,16 @@ export default function Form({ assessment, items }) {
                                         </button>
                                     ))}
                                 </div>
-                                <div className="flex justify-between text-[10px] sm:text-xs text-gray-400 mt-2 px-1">
-                                    <span>Sangat Tidak Setuju (1)</span>
-                                    <span>Sangat Setuju (7)</span>
+                                <div className="flex items-center justify-between text-[11px] sm:text-xs text-gray-500 mt-2.5 px-1">
+                                    <span className="text-gray-500">1 = Sangat Tidak Setuju</span>
+                                    {selectedVal ? (
+                                        <span className="font-semibold text-blue-700 bg-blue-50 px-2.5 py-0.5 rounded-full border border-blue-200 text-[11px]">
+                                            Pilihan: <strong>{selectedVal} - {SCALE_LABELS[selectedVal]}</strong>
+                                        </span>
+                                    ) : (
+                                        <span className="text-gray-400 italic text-[10px]">Klik angka 1 s.d. 7</span>
+                                    )}
+                                    <span className="text-gray-500">7 = Sangat Setuju</span>
                                 </div>
                             </div>
                         );
