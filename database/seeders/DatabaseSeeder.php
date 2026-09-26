@@ -24,6 +24,10 @@ class DatabaseSeeder extends Seeder
 
         $this->call([
             LaratrustSeeder::class,
+            BranchSeeder::class,
+            ModelVersionSeeder::class,
+            CalibrationParameterSeeder::class,
+            ItemMasterSeeder::class,
         ]);
     }
 }

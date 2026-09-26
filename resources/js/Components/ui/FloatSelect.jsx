@@ -65,8 +65,8 @@ export function FloatSelect({
   const filled      = !!selected;
   const floating    = open || focused || filled;
   const isActive    = open || focused;
-  const borderColor = error ? '#d32f2f' : isActive ? '#0152EA' : '#E2E8F0';
-  const labelColor  = error ? '#d32f2f' : isActive ? '#0152EA' : '#1F2A3D';
+  const borderColor = error ? '#d32f2f' : '#E2E8F0';
+  const labelColor  = error ? '#d32f2f' : '#1F2A3D';
 
   // Notch width same formula as FloatInput
   const notchW = floating && label ? label.length * 6.6 + 10 : 0;
@@ -125,7 +125,7 @@ export function FloatSelect({
   };
 
   return (
-    <div style={{ position: 'relative', width: '100%' }} ref={containerRef}>
+    <div style={{ position: 'relative', width: '100%' }} ref={containerRef} onMouseDown={e => { if (!open) e.preventDefault(); }}>
 
       {/* Floating label */}
       {label && (
@@ -171,6 +171,9 @@ export function FloatSelect({
           boxSizing: 'border-box',
           cursor: disabled ? 'not-allowed' : 'pointer',
           backgroundColor: disabled ? '#F8FAFC' : '#fff',
+          outline: 'none',
+          boxShadow: 'none',
+          WebkitBoxShadow: 'none',
         }}
       >
         {/* Notched fieldset border */}
@@ -187,6 +190,9 @@ export function FloatSelect({
             pointerEvents: 'none',
             transition: 'border-color 200ms',
             overflow: 'hidden',
+            outline: 'none',
+            boxShadow: 'none',
+            WebkitBoxShadow: 'none',
           }}
         >
           <legend style={{
@@ -218,6 +224,8 @@ export function FloatSelect({
               id={id}
               value={query}
               onChange={e => setQuery(e.target.value)}
+              onFocus={e => { e.target.style.outline = 'none'; e.target.style.boxShadow = 'none'; e.target.style.WebkitBoxShadow = 'none'; }}
+              onBlur={e => { e.target.style.outline = 'none'; e.target.style.boxShadow = 'none'; e.target.style.WebkitBoxShadow = 'none'; }}
               placeholder={`Cari ${label || ''}...`}
               style={{
                 fontFamily: 'Manrope, sans-serif',
@@ -227,6 +235,10 @@ export function FloatSelect({
                 background: 'transparent',
                 border: 'none',
                 outline: 'none',
+                boxShadow: 'none',
+                WebkitBoxShadow: 'none',
+                MozAppearance: 'none',
+                appearance: 'none',
                 width: '100%',
                 padding: 0,
                 margin: 0,
@@ -264,8 +276,10 @@ export function FloatSelect({
         }}>
           <button
             type="button"
+            onMouseDown={e => e.preventDefault()}
             onClick={open ? (e) => { e.stopPropagation(); handleClose(); } : (e) => { e.stopPropagation(); handleOpen(); }}
-            style={{ width: 18, height: 18, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94A3B8', background: 'none', border: 'none', cursor: 'pointer', padding: 0, borderRadius: 4 }}
+            onFocus={e => { e.target.style.outline = 'none'; e.target.style.boxShadow = 'none'; e.target.style.WebkitBoxShadow = 'none'; }}
+            style={{ width: 18, height: 18, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94A3B8', background: 'none', border: 'none', cursor: 'pointer', padding: 0, borderRadius: 4, outline: 'none', boxShadow: 'none', WebkitBoxShadow: 'none', WebkitTapHighlightColor: 'transparent', appearance: 'none' }}
           >
             <svg
               style={{ transition: 'transform 200ms', transform: open ? 'rotate(180deg)' : 'rotate(0deg)' }}
