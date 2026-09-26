@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, useForm, Link, usePage } from '@inertiajs/react';
+import { useToast } from '@/Components/ui/Toast';
 
 export default function Detail({
     assessment,
@@ -13,6 +14,7 @@ export default function Detail({
 }) {
     const [copied, setCopied] = useState(false);
     const { errors: pageErrors } = usePage().props;
+    const toast = useToast();
 
     // Form Catatan Petugas (AO)
     const { data, setData, post, processing } = useForm({
@@ -38,6 +40,7 @@ export default function Detail({
     const copyLink = () => {
         navigator.clipboard.writeText(questionnaire_url);
         setCopied(true);
+        toast?.success('Link kuesioner berhasil disalin ke clipboard!');
         setTimeout(() => setCopied(false), 2000);
     };
 

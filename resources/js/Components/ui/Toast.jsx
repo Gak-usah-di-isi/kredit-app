@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useState } from 'react';
+import React, { createContext, useContext, useCallback, useEffect, useState, useRef } from 'react';
+import { usePage } from '@inertiajs/react';
 
 const TOAST_VARIANTS = {
   success: {
@@ -124,7 +125,74 @@ export function ToastContainer({ toasts, onClose }) {
   );
 }
 
+export const ToastContext = createContext(null);
+
+export function ToastProvider({ children }) {
+  const [toasts, setToasts] = useState([]);
+  const pageProps = usePage()?.props || {};
+  const flash = pageProps.flash;
+  const lastFlashedRef = useRef(null);
+
+  const remove = useCallback(
+    (id) => setToasts((prev) => prev.filter((toast) => toast.id !== id)),
+    []
+  );
+
+  const show = useCallback((type, message) => {
+    if (!message) return;
+    const id = Date.now() + Math.random();
+    setToasts((prev) => [...prev, { id, type, message }]);
+  }, []);
+
+  const toastMethods = {
+    toasts,
+    remove,
+    show,
+    success: (msg) => show('success', msg),
+    error: (msg) => show('error', msg),
+    warning: (msg) => show('warning', msg),
+    info: (msg) => show('info', msg),
+  };
+
+  useEffect(() => {
+    if (!flash) return;
+
+    const flashKey = JSON.stringify(flash);
+    if (lastFlashedRef.current === flashKey) return;
+    lastFlashedRef.current = flashKey;
+
+    if (flash.type && flash.message) {
+      show(flash.type, flash.message);
+    } else if (flash.success) {
+      show('success', flash.success);
+    } else if (flash.error) {
+      show('error', flash.error);
+    } else if (flash.warning) {
+      show('warning', flash.warning);
+    } else if (flash.info) {
+      show('info', flash.info);
+    } else if (flash.status) {
+      const msg = flash.status === 'profile-updated' 
+        ? 'Profil berhasil diperbarui.' 
+        : (flash.status === 'password-updated' ? 'Kata sandi berhasil diperbarui.' : flash.status);
+      show('success', msg);
+    }
+  }, [flash, show]);
+
+  return (
+    <ToastContext.Provider value={toastMethods}>
+      {children}
+      <ToastContainer toasts={toasts} onClose={remove} />
+    </ToastContext.Provider>
+  );
+}
+
 export function useToast() {
+  const context = useContext(ToastContext);
+  if (context) {
+    return context;
+  }
+
   const [toasts, setToasts] = useState([]);
 
   const remove = useCallback(
@@ -140,6 +208,7 @@ export function useToast() {
   return {
     toasts,
     remove,
+    show,
     success: (message) => show('success', message),
     error: (message) => show('error', message),
     warning: (message) => show('warning', message),

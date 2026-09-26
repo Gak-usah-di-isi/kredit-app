@@ -42,6 +42,15 @@ class HandleInertiaRequests extends Middleware
                 'name' => $r->name,
                 'display_name' => $r->display_name,
             ]) : [],
+            'flash' => [
+                'success' => $request->session()->get('success'),
+                'error'   => $request->session()->get('error'),
+                'warning' => $request->session()->get('warning'),
+                'info'    => $request->session()->get('info'),
+                'status'  => $request->session()->get('status'),
+                'type'    => $request->session()->get('success') ? 'success' : ($request->session()->get('error') ? 'error' : ($request->session()->get('warning') ? 'warning' : ($request->session()->get('info') ? 'info' : null))),
+                'message' => $request->session()->get('success') ?? $request->session()->get('error') ?? $request->session()->get('warning') ?? $request->session()->get('info') ?? $request->session()->get('status'),
+            ],
         ];
     }
 }
