@@ -281,9 +281,27 @@ export default function Detail({
                                         <button
                                             type="submit"
                                             disabled={processing}
-                                            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs rounded-lg transition disabled:opacity-50"
+                                            className={`inline-flex items-center gap-1.5 px-4 py-2 font-semibold text-xs rounded-lg transition disabled:opacity-50 text-white ${
+                                                decision?.officer_note
+                                                    ? 'bg-amber-600 hover:bg-amber-700'
+                                                    : 'bg-blue-600 hover:bg-blue-700'
+                                            }`}
                                         >
-                                            Simpan Catatan Petugas
+                                            {decision?.officer_note ? (
+                                                <>
+                                                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                                    </svg>
+                                                    Edit Catatan Review
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                                                    </svg>
+                                                    Simpan Catatan Petugas
+                                                </>
+                                            )}
                                         </button>
                                     </form>
                                 ) : (
@@ -350,7 +368,9 @@ export default function Detail({
                                             disabled={approverForm.processing}
                                             className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs rounded-lg shadow-sm transition disabled:opacity-50"
                                         >
-                                            Simpan Keputusan Pejabat Pemutus
+                                            {decision?.approver_decision && decision.approver_decision !== 'PENDING'
+                                                ? 'Perbarui Keputusan Pejabat Pemutus'
+                                                : 'Simpan Keputusan Pejabat Pemutus'}
                                         </button>
                                     </form>
                                 ) : (
@@ -455,7 +475,7 @@ export default function Detail({
                                             disabled={outcomeForm.processing}
                                             className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs rounded-lg transition disabled:opacity-50"
                                         >
-                                            Simpan Data Kolektibilitas (Y0)
+                                            {outcome ? 'Perbarui Data Kolektibilitas (Y0)' : 'Simpan Data Kolektibilitas (Y0)'}
                                         </button>
                                     </form>
                                 )}
