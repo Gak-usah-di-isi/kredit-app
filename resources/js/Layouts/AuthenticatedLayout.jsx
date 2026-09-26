@@ -3,6 +3,7 @@ import { usePage } from '@inertiajs/react';
 import KreditAppSidebar from '@/Pages/layout/KreditAppSidebar';
 import KreditAppTopbar from '@/Pages/layout/KreditAppTopbar';
 import SidebarContentNasabah from '@/Pages/layout/SidebarItemsNasabah';
+import SidebarContentAO from '@/Pages/layout/SidebarItemsAO';
 
 export default function AuthenticatedLayout({ children, header, sidebarItems }) {
     const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
@@ -12,10 +13,17 @@ export default function AuthenticatedLayout({ children, header, sidebarItems }) 
     const user = authUser || auth?.user;
     const roles = authRoles || (user?.roles ? user.roles.map(r => r.name) : []);
     const isNasabah = roles.includes('nasabah') || roles.length === 0;
+    const isAO = roles.includes('petugas_kredit');
 
-    // Untuk role nasabah berikan 1 nama menu (MENU) dan sub menu (Dashboard).
-    // Jika ada props sidebarItems eksplisit, gunakan itu; jika tidak, jika role nasabah pakai SidebarContentNasabah
-    const items = sidebarItems ?? (isNasabah ? SidebarContentNasabah : undefined);
+    // Menentukan sidebar mana yang dipakai
+    let resolvedItems = sidebarItems;
+    if (!resolvedItems) {
+        if (isNasabah) {
+            resolvedItems = SidebarContentNasabah;
+        } else if (isAO) {
+            resolvedItems = SidebarContentAO;
+        }
+    }
 
     return (
         <div className="flex w-full h-screen overflow-hidden bg-[#F4F7FB]">
@@ -25,7 +33,7 @@ export default function AuthenticatedLayout({ children, header, sidebarItems }) 
                 onMobileClose={() => setIsMobileSidebarOpen(false)}
                 onStandByMode={() => {}}
                 currentPath={currentPath}
-                items={items}
+                items={resolvedItems}
             />
 
             {/* Main Content */}

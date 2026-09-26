@@ -41,7 +41,11 @@ export default function KreditAppSidebar({
   items,
 }) {
   const { dark } = useTheme();
-  const { activeYear, logoPath, viewingYear, availableYears = [], isArchiveMode } = usePage().props;
+  const { activeYear, logoPath, viewingYear, availableYears = [], isArchiveMode, auth, authUser, authRoles } = usePage().props;
+  const userForRole = authUser || auth?.user;
+  const rolesForSidebar = authRoles || (userForRole?.roles ? userForRole.roles.map(r => r.name) : []);
+  const isNasabahSidebar = rolesForSidebar.includes('nasabah') || rolesForSidebar.length === 0;
+  const isAOSidebar = rolesForSidebar.includes('petugas_kredit');
   // Pemilih tahun hanya dikirim backend untuk role peserta; role lain
   // tetap melihat label tahun aktif saja.
   const canSwitchYear = availableYears.length > 1;
@@ -97,7 +101,7 @@ export default function KreditAppSidebar({
         <img src={logoPath || '/images/logo.png'} alt="Kredit App" className="h-9 w-auto object-contain" />
       </div>
 
-      {/* Account Status (Opsi 1) */}
+      {/* Account Status — show for nasabah and AO (different label) */}
       <div className="px-4 pt-4 pb-1">
         <div
           className="w-full rounded-xl p-3 py-2.5 transition-colors"
@@ -113,11 +117,11 @@ export default function KreditAppSidebar({
               </div>
               <div className="flex flex-col text-left">
                 <span className="text-sm font-semibold leading-tight" style={{ color: text }}>
-                  Akun Nasabah
+                  {isNasabahSidebar ? 'Akun Nasabah' : isAOSidebar ? 'Account Officer' : 'Akun'}
                 </span>
                 <span className="text-xs flex items-center gap-1 font-medium mt-0.5 text-emerald-600">
                   <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                  Terverifikasi
+                  {isNasabahSidebar ? 'Terverifikasi' : isAOSidebar ? 'Terverifikasi' : 'Terverifikasi'}
                 </span>
               </div>
             </div>

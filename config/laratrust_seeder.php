@@ -24,6 +24,7 @@ return [
 
         // 2. Petugas Kredit / Account Officer (AO)
         'petugas_kredit' => [
+            'item_master'          => 'c,r,u,d', // AO diberi hak untuk kelola soal/kuis
             'assessments'          => 'c,r,u',
             'borrowers'            => 'c,r,u',
             'assessment_responses' => 'c,r',

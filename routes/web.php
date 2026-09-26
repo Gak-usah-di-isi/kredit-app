@@ -11,14 +11,57 @@ Route::get('/', function () {
 });
 
 Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
+    $user = auth()->user();
+    $roles = $user->roles->pluck('name')->toArray();
+    
+    $stats = [
+        'total' => 0,
+        'supportive' => 0,
+        'review' => 0,
+        'concern' => 0,
+    ];
+
+    if (in_array('petugas_kredit', $roles)) {
+        $stats['total'] = \App\Models\Assessment::where('officer_id', $user->id)->count();
+        $stats['supportive'] = \App\Models\AssessmentDecision::whereHas('assessment', function($q) use ($user) {
+            $q->where('officer_id', $user->id);
+        })->where('final_recommendation', 'SUPPORTIVE')->count();
+        $stats['review'] = \App\Models\AssessmentDecision::whereHas('assessment', function($q) use ($user) {
+            $q->where('officer_id', $user->id);
+        })->where('final_recommendation', 'like', '%REVIEW%')->count();
+        $stats['concern'] = \App\Models\AssessmentDecision::whereHas('assessment', function($q) use ($user) {
+            $q->where('officer_id', $user->id);
+        })->where('final_recommendation', 'like', '%CONCERN%')->count();
+    }
+
+    return Inertia::render('Dashboard', [
+        'stats' => $stats
+    ]);
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // PCSM-SOPI Petugas Kredit (AO) Routes
+    Route::get('/borrowers', [App\Http\Controllers\BorrowerController::class, 'index'])->name('borrowers.index');
+    Route::get('/borrowers/create', [App\Http\Controllers\BorrowerController::class, 'create'])->name('borrowers.create');
+    Route::post('/borrowers', [App\Http\Controllers\BorrowerController::class, 'store'])->name('borrowers.store');
+
+    Route::get('/assessments', [App\Http\Controllers\AssessmentController::class, 'index'])->name('assessments.index');
+    Route::get('/assessments/create', [App\Http\Controllers\AssessmentController::class, 'create'])->name('assessments.create');
+    Route::post('/assessments', [App\Http\Controllers\AssessmentController::class, 'store'])->name('assessments.store');
+    Route::get('/assessments/{id}', [App\Http\Controllers\AssessmentController::class, 'show'])->name('assessments.show');
+    Route::post('/assessments/{id}/note', [App\Http\Controllers\AssessmentController::class, 'addNote'])->name('assessments.addNote');
 });
+
+// PCSM-SOPI Public/Token Routes (Nasabah)
+Route::get('/kuesioner/selesai', [App\Http\Controllers\QuestionnaireController::class, 'selesai'])->name('kuesioner.selesai');
+Route::get('/kuesioner/{token}/consent', [App\Http\Controllers\QuestionnaireController::class, 'showConsent'])->name('kuesioner.consent');
+Route::post('/kuesioner/{token}/consent', [App\Http\Controllers\QuestionnaireController::class, 'submitConsent'])->name('kuesioner.consent.submit');
+Route::get('/kuesioner/{token}', [App\Http\Controllers\QuestionnaireController::class, 'showForm'])->name('kuesioner.form');
+Route::post('/kuesioner/{token}', [App\Http\Controllers\QuestionnaireController::class, 'submitForm'])->name('kuesioner.submit');
 
 // Template Radix UI (development only)
 Route::get('/template', [TemplateController::class, 'index'])->name('template.index');

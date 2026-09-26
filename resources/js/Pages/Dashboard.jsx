@@ -1,8 +1,15 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, usePage } from '@inertiajs/react';
 
-export default function Dashboard() {
+export default function Dashboard({ stats }) {
     const { auth } = usePage().props;
+
+    const displayStats = [
+        { label: 'Total Asesmen', value: stats?.total || '0', icon: '📄', color: 'bg-blue-50 text-blue-600 border-blue-100' },
+        { label: 'Supportive', value: stats?.supportive || '0', icon: '✅', color: 'bg-emerald-50 text-emerald-600 border-emerald-100' },
+        { label: 'Review', value: stats?.review || '0', icon: '⚠️', color: 'bg-amber-50 text-amber-600 border-amber-100' },
+        { label: 'Concern', value: stats?.concern || '0', icon: '❌', color: 'bg-rose-50 text-rose-600 border-rose-100' },
+    ];
 
     return (
         <AuthenticatedLayout>
@@ -15,18 +22,13 @@ export default function Dashboard() {
                         Selamat Datang, {auth?.user?.name ?? 'Pengguna'}! 👋
                     </h1>
                     <p className="mt-1 text-blue-100 text-sm">
-                        Ini adalah halaman dashboard Kredit App. Kelola semua aktivitas kredit Anda di sini.
+                        Ini adalah halaman dashboard PCSM-SOPI. Kelola dan pantau hasil asesmen psikometrik calon debitur Anda di sini.
                     </p>
                 </div>
 
                 {/* Stats Grid */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                    {[
-                        { label: 'Total Pengajuan', value: '0', icon: '📄', color: 'bg-blue-50 text-blue-600 border-blue-100' },
-                        { label: 'Disetujui', value: '0', icon: '✅', color: 'bg-green-50 text-green-600 border-green-100' },
-                        { label: 'Ditolak', value: '0', icon: '❌', color: 'bg-red-50 text-red-600 border-red-100' },
-                        { label: 'Menunggu Review', value: '0', icon: '⏳', color: 'bg-amber-50 text-amber-600 border-amber-100' },
-                    ].map((stat) => (
+                    {displayStats.map((stat) => (
                         <div
                             key={stat.label}
                             className={`bg-white rounded-xl border p-5 flex items-center gap-4 shadow-sm ${stat.color}`}

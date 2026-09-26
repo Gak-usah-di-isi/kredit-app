@@ -12,8 +12,8 @@ export function FloatInput({
   const filled   = value !== '' && value !== null && value !== undefined;
   const floating = focused || filled || forceFloating;
 
-  const borderColor = error ? '#d32f2f' : focused ? '#0152EA' : '#E2E8F0';
-  const labelColor  = error ? '#d32f2f' : focused ? '#0152EA' : '#1F2A3D';
+  const borderColor = error ? '#d32f2f' : '#E2E8F0';
+  const labelColor  = error ? '#d32f2f' : '#1F2A3D';
 
   // Notch width: label scaled 0.75, each char ~6.6px at 0.875rem, +8px padding
   const notchW = floating && label ? label.length * 6.6 + 10 : 0;
@@ -67,6 +67,9 @@ export function FloatInput({
           boxSizing: 'border-box',
           cursor: disabled ? 'not-allowed' : 'text',
           backgroundColor: disabled ? '#F8FAFC' : '#fff',
+          outline: 'none',
+          boxShadow: 'none',
+          WebkitBoxShadow: 'none',
         }}
       >
         {/* Notched fieldset — purely visual border */}
@@ -83,6 +86,9 @@ export function FloatInput({
             transition: 'border-color 200ms',
             overflow: 'hidden',
             bottom: 0,
+            outline: 'none',
+            boxShadow: 'none',
+            WebkitBoxShadow: 'none',
           }}
         >
           <legend style={{
@@ -107,8 +113,8 @@ export function FloatInput({
             ref={ref} id={id} value={value} onChange={onChange}
             disabled={disabled} rows={rows}
             placeholder={focused ? placeholder : ''}
-            onFocus={(event) => { setFocused(true); onFocus?.(event); }}
-            onBlur={(event) => { setFocused(false); onBlur?.(event); }}
+            onFocus={(event) => { setFocused(true); event.target.style.outline = 'none'; event.target.style.boxShadow = 'none'; event.target.style.WebkitBoxShadow = 'none'; onFocus?.(event); }}
+            onBlur={(event) => { setFocused(false); event.target.style.outline = 'none'; event.target.style.boxShadow = 'none'; event.target.style.WebkitBoxShadow = 'none'; onBlur?.(event); }}
             style={{
               fontFamily: 'Manrope, sans-serif',
               fontSize: '0.875rem',
@@ -117,6 +123,10 @@ export function FloatInput({
               background: 'transparent',
               border: 'none',
               outline: 'none',
+              boxShadow: 'none',
+              WebkitBoxShadow: 'none',
+              MozAppearance: 'none',
+              appearance: 'none',
               width: '100%',
               boxSizing: 'border-box',
               cursor: disabled ? 'not-allowed' : undefined,
@@ -131,8 +141,8 @@ export function FloatInput({
             ref={ref} id={id} type={type} value={value} onChange={onChange}
             disabled={disabled}
             placeholder={focused ? placeholder : ''}
-            onFocus={(event) => { setFocused(true); onFocus?.(event); }}
-            onBlur={(event) => { setFocused(false); onBlur?.(event); }}
+            onFocus={(event) => { setFocused(true); event.target.style.outline = 'none'; event.target.style.boxShadow = 'none'; event.target.style.WebkitBoxShadow = 'none'; onFocus?.(event); }}
+            onBlur={(event) => { setFocused(false); event.target.style.outline = 'none'; event.target.style.boxShadow = 'none'; event.target.style.WebkitBoxShadow = 'none'; onBlur?.(event); }}
             style={{
               fontFamily: 'Manrope, sans-serif',
               fontSize: '0.875rem',
@@ -141,6 +151,10 @@ export function FloatInput({
               background: 'transparent',
               border: 'none',
               outline: 'none',
+              boxShadow: 'none',
+              WebkitBoxShadow: 'none',
+              MozAppearance: 'none',
+              appearance: 'none',
               width: '100%',
               boxSizing: 'border-box',
               cursor: disabled ? 'not-allowed' : undefined,
