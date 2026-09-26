@@ -2,8 +2,7 @@ import { useState } from 'react';
 import { usePage } from '@inertiajs/react';
 import KreditAppSidebar from '@/Pages/layout/KreditAppSidebar';
 import KreditAppTopbar from '@/Pages/layout/KreditAppTopbar';
-import SidebarContentNasabah from '@/Pages/layout/SidebarItemsNasabah';
-import SidebarContentAO from '@/Pages/layout/SidebarItemsAO';
+import { getSidebarItemsByRole } from '@/Pages/layout/getSidebarItems';
 
 export default function AuthenticatedLayout({ children, header, sidebarItems }) {
     const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
@@ -12,18 +11,9 @@ export default function AuthenticatedLayout({ children, header, sidebarItems }) 
 
     const user = authUser || auth?.user;
     const roles = authRoles || (user?.roles ? user.roles.map(r => r.name) : []);
-    const isNasabah = roles.includes('nasabah') || roles.length === 0;
-    const isAO = roles.includes('petugas_kredit');
 
-    // Menentukan sidebar mana yang dipakai
-    let resolvedItems = sidebarItems;
-    if (!resolvedItems) {
-        if (isNasabah) {
-            resolvedItems = SidebarContentNasabah;
-        } else if (isAO) {
-            resolvedItems = SidebarContentAO;
-        }
-    }
+    // Menentukan sidebar berdasarkan role
+    const resolvedItems = sidebarItems || getSidebarItemsByRole(roles);
 
     return (
         <div className="flex w-full h-screen overflow-hidden bg-[#F4F7FB]">

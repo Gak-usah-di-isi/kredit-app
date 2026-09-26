@@ -14,17 +14,16 @@ return [
     'roles_structure' => [
         // 1. Admin Sistem (Unit IT / Peneliti)
         'admin_sistem' => [
-            'users'                 => 'c,r,u,d',
-            'item_master'           => 'c,r,u,d',
+            'users'                  => 'c,r,u,d',
+            'item_master'            => 'c,r,u,d',
             'calibration_parameters' => 'c,r,u,d',
-            'model_versions'        => 'c,r,u,d',
-            'audit_log'             => 'r',
-            'assessments'           => 'r',
+            'model_versions'         => 'c,r,u,d',
+            'audit_log'              => 'r',
+            'assessments'            => 'r',
         ],
 
         // 2. Petugas Kredit / Account Officer (AO)
         'petugas_kredit' => [
-            'item_master'          => 'c,r,u,d', // AO diberi hak untuk kelola soal/kuis
             'assessments'          => 'c,r,u',
             'borrowers'            => 'c,r,u',
             'assessment_responses' => 'c,r',

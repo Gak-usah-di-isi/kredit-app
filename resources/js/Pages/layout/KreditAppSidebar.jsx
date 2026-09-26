@@ -26,12 +26,6 @@ function SidebarBadge({ badge }) {
     </span>
   );
 }
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-} from '../../Components/ui/dropdown-menu';
-import { useTheme } from "../../Components/ui/shared/ThemeContext";
 
 export default function KreditAppSidebar({
   isMobileOpen = false,
@@ -40,21 +34,20 @@ export default function KreditAppSidebar({
   currentPath,
   items,
 }) {
-  const { dark } = useTheme();
-  const { activeYear, logoPath, viewingYear, availableYears = [], isArchiveMode, auth, authUser, authRoles } = usePage().props;
+  const { logoPath, auth, authUser, authRoles } = usePage().props;
   const userForRole = authUser || auth?.user;
   const rolesForSidebar = authRoles || (userForRole?.roles ? userForRole.roles.map(r => r.name) : []);
-  const isNasabahSidebar = rolesForSidebar.includes('nasabah') || rolesForSidebar.length === 0;
-  const isAOSidebar = rolesForSidebar.includes('petugas_kredit');
-  // Pemilih tahun hanya dikirim backend untuk role peserta; role lain
-  // tetap melihat label tahun aktif saja.
-  const canSwitchYear = availableYears.length > 1;
-  const shownYear = viewingYear ?? activeYear?.year;
 
-  const handleYearChange = (year) => {
-    if (year === viewingYear) return;
-    router.post('/viewing-year', { year }, { preserveScroll: true });
+  const getRoleDisplayName = (roles) => {
+    if (roles.includes('admin_sistem')) return 'Admin Sistem';
+    if (roles.includes('pejabat_pemutus')) return 'Pejabat Pemutus';
+    if (roles.includes('manajemen_risiko')) return 'Manajemen Risiko';
+    if (roles.includes('compliance')) return 'Unit Kepatuhan';
+    if (roles.includes('petugas_kredit')) return 'Account Officer';
+    if (roles.includes('nasabah')) return 'Akun Nasabah';
+    return 'Pengguna';
   };
+
   const menuItems = items ?? SidebarContent;
   const [expandedSections, setExpandedSections] = useState(new Set());
 
@@ -84,15 +77,15 @@ export default function KreditAppSidebar({
   };
 
   // theme tokens
-  const bg    = dark ? '#1E293B' : '#ffffff';
-  const bord  = dark ? '#334155' : '#e5e7eb';
-  const text  = dark ? '#CBD5E1' : '#374151';
-  const sub   = dark ? '#64748B' : '#6B7280';
-  const hover = dark ? 'rgba(255,255,255,0.06)' : '#F9FAFB';
-  const activeBg   = dark ? 'rgba(1,82,234,0.18)' : '#EFF3FF';
+  const bg    = '#ffffff';
+  const bord  = '#e5e7eb';
+  const text  = '#374151';
+  const sub   = '#6B7280';
+  const hover = '#F9FAFB';
+  const activeBg   = '#EFF3FF';
   const activeText = '#0152EA';
-  const clinicBg   = dark ? '#0F172A' : '#ffffff';
-  const clinicBord = dark ? '#334155' : '#e5e7eb';
+  const clinicBg   = '#ffffff';
+  const clinicBord = '#e5e7eb';
 
   const sidebarContent = (
     <>
@@ -101,7 +94,7 @@ export default function KreditAppSidebar({
         <img src={logoPath || '/images/logo.png'} alt="Kredit App" className="h-9 w-auto object-contain" />
       </div>
 
-      {/* Account Status — show for nasabah and AO (different label) */}
+      {/* Account Status — role info */}
       <div className="px-4 pt-4 pb-1">
         <div
           className="w-full rounded-xl p-3 py-2.5 transition-colors"
@@ -117,11 +110,11 @@ export default function KreditAppSidebar({
               </div>
               <div className="flex flex-col text-left">
                 <span className="text-sm font-semibold leading-tight" style={{ color: text }}>
-                  {isNasabahSidebar ? 'Akun Nasabah' : isAOSidebar ? 'Account Officer' : 'Akun'}
+                  {getRoleDisplayName(rolesForSidebar)}
                 </span>
                 <span className="text-xs flex items-center gap-1 font-medium mt-0.5 text-emerald-600">
                   <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                  {isNasabahSidebar ? 'Terverifikasi' : isAOSidebar ? 'Terverifikasi' : 'Terverifikasi'}
+                  Terverifikasi
                 </span>
               </div>
             </div>

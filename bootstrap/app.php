@@ -16,7 +16,11 @@ return Application::configure(basePath: dirname(__DIR__))
             \Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets::class,
         ]);
 
-        //
+        $middleware->alias([
+            'role' => \Laratrust\Middleware\Role::class,
+            'permission' => \Laratrust\Middleware\Permission::class,
+            'ability' => \Laratrust\Middleware\Ability::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

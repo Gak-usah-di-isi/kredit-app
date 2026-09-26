@@ -38,6 +38,10 @@ class HandleInertiaRequests extends Middleware
             ],
             'authUser' => $user,
             'authRoles' => $user ? $user->getRoles() : [],
+            'authRoleDetails' => $user ? $user->roles->map(fn($r) => [
+                'name' => $r->name,
+                'display_name' => $r->display_name,
+            ]) : [],
         ];
     }
 }

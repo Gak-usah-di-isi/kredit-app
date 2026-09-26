@@ -46,6 +46,11 @@ class Assessment extends Model
         return $this->belongsTo(Branch::class);
     }
     
+    public function modelVersion()
+    {
+        return $this->belongsTo(ModelVersion::class);
+    }
+
     public function responses()
     {
         return $this->hasMany(AssessmentResponse::class);
@@ -69,5 +74,15 @@ class Assessment extends Model
     public function consent()
     {
         return $this->hasOne(ConsentLog::class);
+    }
+
+    public function outcomeMonitoring()
+    {
+        return $this->hasOne(OutcomeMonitoring::class);
+    }
+
+    public function outcomeMonitorings()
+    {
+        return $this->hasMany(OutcomeMonitoring::class);
     }
 }

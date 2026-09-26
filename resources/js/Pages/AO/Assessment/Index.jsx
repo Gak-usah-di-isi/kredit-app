@@ -3,7 +3,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { FloatSelect } from '@/Components/ui/FloatSelect';
 
-export default function Index({ assessments }) {
+export default function Index({ assessments, canCreateAssessment = false }) {
     const [showModal, setShowModal] = useState(false);
     const { data, setData, post, processing, errors } = useForm({ borrower_id: '' });
     const { borrowers = [] } = usePage().props;
@@ -29,17 +29,19 @@ export default function Index({ assessments }) {
                     <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                         <div>
                             <h3 className="text-lg font-bold text-gray-900">Riwayat Asesmen PCSM-SOPI</h3>
-                            <p className="text-sm text-gray-500">Kelola dan pantau hasil asesmen calon debitur Anda</p>
+                            <p className="text-sm text-gray-500">Kelola dan pantau hasil asesmen calon debitur</p>
                         </div>
-                        <button
-                            onClick={() => setShowModal(true)}
-                            className="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow hover:bg-blue-700 transition"
-                        >
-                            + Buat Asesmen Baru
-                        </button>
+                        {canCreateAssessment && (
+                            <button
+                                onClick={() => setShowModal(true)}
+                                className="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow hover:bg-blue-700 transition"
+                            >
+                                + Buat Asesmen Baru
+                            </button>
+                        )}
                     </div>
 
-                    {/* Create modal (uses native select to avoid FloatSelect visual issue) */}
+                    {/* Create modal */}
                     {showModal && (
                         <div className="fixed inset-0 z-50 flex items-center justify-center">
                             <div className="fixed inset-0 bg-black/40" onClick={() => setShowModal(false)} />
@@ -97,6 +99,7 @@ export default function Index({ assessments }) {
                                 <tr>
                                     <th className="px-6 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">ID / Tanggal</th>
                                     <th className="px-6 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Nasabah</th>
+                                    <th className="px-6 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Account Officer</th>
                                     <th className="px-6 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Status</th>
                                     <th className="px-6 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Rekomendasi</th>
                                     <th className="px-6 py-3.5 text-right text-xs font-semibold uppercase tracking-wider text-gray-600">Aksi</th>
@@ -105,8 +108,8 @@ export default function Index({ assessments }) {
                             <tbody className="divide-y divide-gray-100 bg-white">
                                 {assessments.length === 0 ? (
                                     <tr>
-                                        <td colSpan="5" className="px-6 py-8 text-center text-sm text-gray-500">
-                                            Belum ada asesmen yang dibuat. Klik tombol di atas untuk membuat asesmen baru.
+                                        <td colSpan="6" className="px-6 py-8 text-center text-sm text-gray-500">
+                                            Belum ada asesmen yang dibuat.
                                         </td>
                                     </tr>
                                 ) : (
@@ -119,6 +122,10 @@ export default function Index({ assessments }) {
                                             <td className="whitespace-nowrap px-6 py-4 text-sm">
                                                 <div className="font-medium text-gray-900">{item.borrower?.name}</div>
                                                 <div className="text-xs text-gray-500">NIK: {item.borrower?.nik}</div>
+                                            </td>
+                                            <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-600">
+                                                <div className="font-medium text-gray-800">{item.officer?.name || '-'}</div>
+                                                <div className="text-xs text-gray-400">{item.officer?.email || ''}</div>
                                             </td>
                                             <td className="whitespace-nowrap px-6 py-4 text-sm capitalize">
                                                 <span className={`inline-flex px-2 py-0.5 rounded text-xs font-medium ${

@@ -16,4 +16,14 @@ class ModelVersion extends Model
     protected $casts = [
         'released_at' => 'date'
     ];
+
+    public function calibrationParameters()
+    {
+        return $this->hasMany(CalibrationParameter::class);
+    }
+
+    public function calibrationParameter()
+    {
+        return $this->hasOne(CalibrationParameter::class);
+    }
 }

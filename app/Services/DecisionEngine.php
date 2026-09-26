@@ -18,9 +18,14 @@ class DecisionEngine
             throw new \Exception("Score, Flags, and Params are required for decision making.");
         }
 
-        // Determine Dimension Categories
+        // Determine Dimension Categories (Dimension-Gated)
         $pfrCategory = $this->categorizeDimension($score->pfr_100, $params->pfr_p25, $params->pfr_p75);
         $ssrCategory = $this->categorizeDimension($score->ssr_100, $params->ssr_p25, $params->ssr_p75);
+
+        // Kredibilitas bermasalah jika SD Flag Elevated/High, Straightlining terdeteksi, atau Variabilitas Rendah
+        $hasCredibilityIssue = in_array($flag->sd_flag, ['Elevated', 'High']) 
+            || $flag->straightline_flag 
+            || $flag->low_variability_flag;
 
         // Determine Final Recommendation
         $finalRec = '';
@@ -34,17 +39,27 @@ class DecisionEngine
             $dim = $pfrCategory === 'Concern' ? 'Keuangan' : 'Keberlanjutan';
             $narrative = "Risiko terdeteksi pada profil {$dim} (Concern). Disarankan review mendalam terkait area tersebut.";
         } elseif ($pfrCategory === 'Review' || $ssrCategory === 'Review') {
-            if ($flag->sd_flag === 'Elevated' || $flag->sd_flag === 'High' || $flag->straightline_flag) {
+            if ($hasCredibilityIssue) {
                 $finalRec = 'ENHANCED REVIEW';
-                $narrative = "Profil berada di area Review, disertai flag kredibilitas. Verifikasi intensif diperlukan.";
+                $reasons = [];
+                if (in_array($flag->sd_flag, ['Elevated', 'High'])) $reasons[] = "Social Desirability {$flag->sd_flag}";
+                if ($flag->straightline_flag) $reasons[] = "pola jawaban seragam";
+                if ($flag->low_variability_flag) $reasons[] = "variasi jawaban rendah";
+                $reasonText = implode(', ', $reasons);
+                $narrative = "Profil berada di area Review, disertai flag kredibilitas ({$reasonText}). Verifikasi intensif diperlukan.";
             } else {
                 $finalRec = 'REVIEW';
                 $narrative = "Profil berada di area rata-rata (Review). Tidak ada masalah serius yang terlihat.";
             }
         } elseif ($pfrCategory === 'Supportive' && $ssrCategory === 'Supportive') {
-            if ($flag->sd_flag === 'Elevated' || $flag->sd_flag === 'High' || $flag->straightline_flag) {
+            if ($hasCredibilityIssue) {
                 $finalRec = 'REVIEW - RESPONSE VERIFICATION';
-                $narrative = "Profil sangat baik (Supportive), namun flag kredibilitas terdeteksi. Disarankan verifikasi atas validitas respon.";
+                $reasons = [];
+                if (in_array($flag->sd_flag, ['Elevated', 'High'])) $reasons[] = "Social Desirability {$flag->sd_flag}";
+                if ($flag->straightline_flag) $reasons[] = "pola jawaban seragam";
+                if ($flag->low_variability_flag) $reasons[] = "variasi jawaban rendah";
+                $reasonText = implode(', ', $reasons);
+                $narrative = "Profil sangat baik (Supportive), namun flag kredibilitas terdeteksi ({$reasonText}). Disarankan verifikasi atas validitas respon.";
             } else {
                 $finalRec = 'SUPPORTIVE';
                 $narrative = "Profil optimal (Supportive) pada semua dimensi. Kredibilitas jawaban baik.";
