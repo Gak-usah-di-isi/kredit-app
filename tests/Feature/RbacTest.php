@@ -273,6 +273,7 @@ class RbacTest extends TestCase
 
         // Karena low_variability_flag aktif, skor supportive harus menjadi REVIEW - RESPONSE VERIFICATION
         $this->assertEquals('REVIEW - RESPONSE VERIFICATION', $decision->final_recommendation);
-        $this->assertStringContainsString('variasi jawaban rendah', $decision->auto_narrative);
+        $this->assertEquals('Elevated/High', $decision->credibility_status);
+        $this->assertStringContainsString('memerlukan verifikasi tambahan', $decision->auto_narrative);
     }
 }

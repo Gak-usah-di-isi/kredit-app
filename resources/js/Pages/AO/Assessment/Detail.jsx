@@ -85,6 +85,51 @@ export default function Detail({
             ? `${minutes} menit ${remainingSeconds} detik`
             : `${minutes} menit`;
     };
+
+    const getPfrNarrative = (category) => {
+        switch (category) {
+            case 'Concern':
+                return 'Skor PFR (Prudent Financial Responsibility) di bawah ambang minimum - kehati-hatian dan tanggung jawab finansial nasabah masih rendah. Disarankan pendalaman lebih lanjut pada pengelolaan keuangan nasabah.';
+            case 'Review':
+                return 'Skor PFR berada pada kisaran menengah - kehati-hatian finansial cukup memadai namun belum kuat. Perlu verifikasi tambahan sebelum disimpulkan.';
+            case 'Supportive':
+                return 'Skor PFR tinggi - nasabah menunjukkan kehati-hatian dan tanggung jawab finansial yang kuat, mendukung proses asesmen kredit.';
+            default:
+                return '-';
+        }
+    };
+
+    const getSsrNarrative = (category) => {
+        switch (category) {
+            case 'Concern':
+                return 'Skor SSR (Stakeholder & Sustainability Responsibility) di bawah ambang minimum - orientasi terhadap keberlanjutan dan tanggung jawab ke komunitas/lingkungan masih rendah.';
+            case 'Review':
+                return 'Skor SSR berada pada kisaran menengah - orientasi keberlanjutan cukup, namun belum konsisten kuat.';
+            case 'Supportive':
+                return 'Skor SSR tinggi - nasabah menunjukkan orientasi kuat terhadap keberlanjutan dan tanggung jawab ke pemangku kepentingan.';
+            default:
+                return '-';
+        }
+    };
+
+    const getSdNarrative = (sd) => {
+        switch (sd) {
+            case 'High':
+                return 'Skor Social Desirability sangat tinggi (>= ambang High) - indikasi kuat jawaban bias ke arah citra diri yang ideal. Skor PFR/SSR sebaiknya tidak diandalkan sepenuhnya tanpa klarifikasi langsung ke nasabah.';
+            case 'Elevated':
+                return 'Skor Social Desirability cukup tinggi (di atas ambang Elevated) - ada kecenderungan menjawab secara terlalu ideal/positif. Perlu diverifikasi agar skor SOPI tidak bias.';
+            default:
+                return 'Pola jawaban terhadap item kontrol Social Desirability wajar, tidak ada indikasi jawaban yang terlalu ideal secara sosial.';
+        }
+    };
+
+    const getCredibilityNarrative = (status) => {
+        if (status === 'Normal') {
+            return 'Tidak ditemukan flag kredibilitas - pola jawaban, variasi jawaban, dan Social Desirability berada dalam batas wajar.';
+        }
+        return 'Ditemukan satu atau lebih flag kredibilitas (Social Desirability tinggi, pola jawaban seragam/straightlining, dan/atau variasi jawaban terlalu rendah). Skor PFR/SSR perlu dibaca hati-hati dan disertai klarifikasi langsung ke nasabah.';
+    };
+
     const decision = assessment.decision;
     const outcome = assessment.outcome_monitoring;
     const responses = assessment.responses || [];
@@ -212,39 +257,66 @@ export default function Detail({
 
                             {/* Grid Skor Dimensi */}
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm">
-                                    <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Prudent Financial (PFR)</div>
-                                    <div className="flex items-baseline gap-2 mt-2">
-                                        <span className="text-3xl font-extrabold text-gray-900">{score?.pfr_100 ?? '-'}</span>
-                                        <span className="text-xs text-gray-500">/ 100</span>
+                                <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm flex flex-col justify-between">
+                                    <div>
+                                        <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Prudent Financial (PFR)</div>
+                                        <div className="flex items-baseline gap-2 mt-2">
+                                            <span className="text-3xl font-extrabold text-gray-900">{score?.pfr_100 ?? '-'}</span>
+                                            <span className="text-xs text-gray-500">/ 100</span>
+                                        </div>
                                     </div>
-                                    <div className="mt-3 flex items-center justify-between text-xs border-t pt-2 text-gray-600">
-                                        <span>Kategori:</span>
-                                        <span className="font-semibold text-gray-900">{decision?.pfr_category}</span>
-                                    </div>
-                                </div>
-
-                                <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm">
-                                    <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Stakeholder & Sust. (SSR)</div>
-                                    <div className="flex items-baseline gap-2 mt-2">
-                                        <span className="text-3xl font-extrabold text-gray-900">{score?.ssr_100 ?? '-'}</span>
-                                        <span className="text-xs text-gray-500">/ 100</span>
-                                    </div>
-                                    <div className="mt-3 flex items-center justify-between text-xs border-t pt-2 text-gray-600">
-                                        <span>Kategori:</span>
-                                        <span className="font-semibold text-gray-900">{decision?.ssr_category}</span>
+                                    <div className="mt-3 border-t pt-2 text-xs">
+                                        <div className="flex items-center justify-between text-gray-600 mb-1.5">
+                                            <span>Kategori:</span>
+                                            <span className={`font-bold px-2 py-0.5 rounded text-[11px] ${
+                                                decision?.pfr_category === 'Supportive' ? 'bg-emerald-100 text-emerald-800' :
+                                                (decision?.pfr_category === 'Review' ? 'bg-blue-100 text-blue-800' : 'bg-red-100 text-red-800')
+                                            }`}>{decision?.pfr_category || '-'}</span>
+                                        </div>
+                                        <p className="text-[11px] text-gray-500 leading-relaxed italic bg-gray-50 p-2 rounded border border-gray-100">
+                                            {getPfrNarrative(decision?.pfr_category)}
+                                        </p>
                                     </div>
                                 </div>
 
-                                <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm">
-                                    <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Overall SOPI Index</div>
-                                    <div className="flex items-baseline gap-2 mt-2">
-                                        <span className="text-3xl font-extrabold text-blue-600">{score?.overall_sopi_100 ?? '-'}</span>
-                                        <span className="text-xs text-gray-500">/ 100</span>
+                                <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm flex flex-col justify-between">
+                                    <div>
+                                        <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Stakeholder & Sust. (SSR)</div>
+                                        <div className="flex items-baseline gap-2 mt-2">
+                                            <span className="text-3xl font-extrabold text-gray-900">{score?.ssr_100 ?? '-'}</span>
+                                            <span className="text-xs text-gray-500">/ 100</span>
+                                        </div>
                                     </div>
-                                    <div className="mt-3 flex items-center justify-between text-xs border-t pt-2 text-gray-600">
-                                        <span>Bobot Dimensi:</span>
-                                        <span className="font-semibold text-gray-900">50% PFR : 50% SSR</span>
+                                    <div className="mt-3 border-t pt-2 text-xs">
+                                        <div className="flex items-center justify-between text-gray-600 mb-1.5">
+                                            <span>Kategori:</span>
+                                            <span className={`font-bold px-2 py-0.5 rounded text-[11px] ${
+                                                decision?.ssr_category === 'Supportive' ? 'bg-emerald-100 text-emerald-800' :
+                                                (decision?.ssr_category === 'Review' ? 'bg-blue-100 text-blue-800' : 'bg-red-100 text-red-800')
+                                            }`}>{decision?.ssr_category || '-'}</span>
+                                        </div>
+                                        <p className="text-[11px] text-gray-500 leading-relaxed italic bg-gray-50 p-2 rounded border border-gray-100">
+                                            {getSsrNarrative(decision?.ssr_category)}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm flex flex-col justify-between">
+                                    <div>
+                                        <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Overall SOPI Index</div>
+                                        <div className="flex items-baseline gap-2 mt-2">
+                                            <span className="text-3xl font-extrabold text-blue-600">{score?.overall_sopi_100 ?? '-'}</span>
+                                            <span className="text-xs text-gray-500">/ 100</span>
+                                        </div>
+                                    </div>
+                                    <div className="mt-3 border-t pt-2 text-xs">
+                                        <div className="flex items-center justify-between text-gray-600 mb-1.5">
+                                            <span>Bobot Dimensi:</span>
+                                            <span className="font-semibold text-gray-900">50% PFR : 50% SSR</span>
+                                        </div>
+                                        <p className="text-[11px] text-gray-500 leading-relaxed bg-blue-50/50 p-2 rounded border border-blue-100">
+                                            Indeks komposit psikometrik gabungan kehati-hatian finansial dan tanggung jawab keberlanjutan.
+                                        </p>
                                     </div>
                                 </div>
                             </div>
@@ -533,9 +605,19 @@ export default function Detail({
                                 )}
                             </div>
 
-                            {/* Flag Kredibilitas Respon */}
-                            <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
-                                <h4 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4">Evaluasi Kredibilitas Respon (Social Desirability)</h4>
+                            {/* Evaluasi Kredibilitas Respon */}
+                            <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 space-y-4">
+                                <div className="flex items-center justify-between">
+                                    <h4 className="text-sm font-bold text-gray-900 uppercase tracking-wider">
+                                        Evaluasi Kredibilitas Respon (Response Credibility)
+                                    </h4>
+                                    <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold ${
+                                        (decision?.credibility_status === 'Normal') ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'
+                                    }`}>
+                                        Status: {decision?.credibility_status || (flag?.sd_flag === 'Normal' && !flag?.straightline_flag && !flag?.low_variability_flag ? 'Normal' : 'Elevated/High')}
+                                    </span>
+                                </div>
+
                                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
                                     <div className="p-3 bg-gray-50 rounded-lg">
                                         <div className="text-xs text-gray-500">Social Desirability (SD)</div>
@@ -554,12 +636,24 @@ export default function Detail({
                                         <div className="font-bold text-gray-900 mt-0.5">{formatCompletionTime(flag?.completion_time_sec)}</div>
                                     </div>
                                 </div>
+
+                                {/* Narasi Analisis Kredibilitas Baku Excel F50 & F51 */}
+                                <div className="space-y-2 pt-2 border-t border-gray-100 text-xs">
+                                    <div className="p-3 bg-slate-50 rounded-lg border border-slate-100/80 leading-relaxed">
+                                        <span className="font-semibold text-slate-800">Analisis Social Desirability: </span>
+                                        <span className="text-slate-600">{getSdNarrative(flag?.sd_flag)}</span>
+                                    </div>
+                                    <div className="p-3 bg-slate-50 rounded-lg border border-slate-100/80 leading-relaxed">
+                                        <span className="font-semibold text-slate-800">Kesimpulan Kredibilitas: </span>
+                                        <span className="text-slate-600">{getCredibilityNarrative(decision?.credibility_status || (flag?.sd_flag === 'Normal' && !flag?.straightline_flag && !flag?.low_variability_flag ? 'Normal' : 'Elevated/High'))}</span>
+                                    </div>
+                                </div>
                             </div>
 
-                            {/* Wajib: Disclaimer Sistem */}
-                            <div className="p-4 bg-gray-50 rounded-xl border border-gray-200/80 text-xs text-gray-500 leading-relaxed">
-                                <span className="font-semibold text-gray-700">Disclaimer: </span>
-                                Hasil PCSM-SOPI merupakan informasi pendukung untuk membantu proses asesmen kredit. Hasil ini tidak merupakan keputusan otomatis persetujuan atau penolakan kredit dan harus dibaca bersama informasi serta prosedur kredit lain yang berlaku di BPR.
+                            {/* Wajib: Disclaimer Sistem Persis Sesuai Excel B68 */}
+                            <div className="p-4 bg-gray-50 rounded-xl border border-gray-200/80 text-xs text-gray-600 leading-relaxed">
+                                <span className="font-semibold text-gray-800">Disclaimer: </span>
+                                Hasil PCSM-SOPI merupakan informasi pendukung untuk membantu proses asesmen kredit (Decision Support System). Hasil ini tidak merupakan keputusan otomatis persetujuan atau penolakan kredit dan harus dibaca bersama informasi serta prosedur kredit lain yang berlaku di BPR. Keputusan final kredit tetap mengikuti SOP, kewenangan pejabat kredit, dan informasi lain yang dipersyaratkan BPR.
                             </div>
                         </>
                     )}

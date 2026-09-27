@@ -50,7 +50,7 @@ class CredibilityEngine
             foreach ($allValues as $val) {
                 $variance += pow($val - $mean, 2);
             }
-            $variance /= $totalItems;
+            $variance /= ($totalItems > 1 ? ($totalItems - 1) : 1);
             $responseSd = sqrt($variance);
 
             if ($params->low_variability_threshold !== null && $responseSd < $params->low_variability_threshold) {

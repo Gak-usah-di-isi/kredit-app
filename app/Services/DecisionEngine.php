@@ -26,56 +26,85 @@ class DecisionEngine
         $hasCredibilityIssue = in_array($flag->sd_flag, ['Elevated', 'High']) 
             || $flag->straightline_flag 
             || $flag->low_variability_flag;
+        $credibilityStatus = $hasCredibilityIssue ? 'Elevated/High' : 'Normal';
 
-        // Determine Final Recommendation
+        // Determine Final Recommendation (Excel formula E57)
         $finalRec = '';
-        $narrative = '';
-
         if ($pfrCategory === 'Concern' && $ssrCategory === 'Concern') {
             $finalRec = 'CONCERN - HIGH PRIORITY REVIEW';
-            $narrative = "Kapasitas finansial dan keberlanjutan berada di bawah standar minimum (Concern). Risiko tinggi terdeteksi pada kedua area.";
         } elseif ($pfrCategory === 'Concern' || $ssrCategory === 'Concern') {
             $finalRec = 'CONCERN';
-            $dim = $pfrCategory === 'Concern' ? 'Keuangan' : 'Keberlanjutan';
-            $narrative = "Risiko terdeteksi pada profil {$dim} (Concern). Disarankan review mendalam terkait area tersebut.";
-        } elseif ($pfrCategory === 'Review' || $ssrCategory === 'Review') {
-            if ($hasCredibilityIssue) {
-                $finalRec = 'ENHANCED REVIEW';
-                $reasons = [];
-                if (in_array($flag->sd_flag, ['Elevated', 'High'])) $reasons[] = "Social Desirability {$flag->sd_flag}";
-                if ($flag->straightline_flag) $reasons[] = "pola jawaban seragam";
-                if ($flag->low_variability_flag) $reasons[] = "variasi jawaban rendah";
-                $reasonText = implode(', ', $reasons);
-                $narrative = "Profil berada di area Review, disertai flag kredibilitas ({$reasonText}). Verifikasi intensif diperlukan.";
-            } else {
-                $finalRec = 'REVIEW';
-                $narrative = "Profil berada di area rata-rata (Review). Tidak ada masalah serius yang terlihat.";
-            }
         } elseif ($pfrCategory === 'Supportive' && $ssrCategory === 'Supportive') {
-            if ($hasCredibilityIssue) {
-                $finalRec = 'REVIEW - RESPONSE VERIFICATION';
-                $reasons = [];
-                if (in_array($flag->sd_flag, ['Elevated', 'High'])) $reasons[] = "Social Desirability {$flag->sd_flag}";
-                if ($flag->straightline_flag) $reasons[] = "pola jawaban seragam";
-                if ($flag->low_variability_flag) $reasons[] = "variasi jawaban rendah";
-                $reasonText = implode(', ', $reasons);
-                $narrative = "Profil sangat baik (Supportive), namun flag kredibilitas terdeteksi ({$reasonText}). Disarankan verifikasi atas validitas respon.";
-            } else {
-                $finalRec = 'SUPPORTIVE';
-                $narrative = "Profil optimal (Supportive) pada semua dimensi. Kredibilitas jawaban baik.";
-            }
+            $finalRec = ($credibilityStatus === 'Normal') ? 'SUPPORTIVE' : 'REVIEW - RESPONSE VERIFICATION';
+        } else {
+            // Salah satu atau kedua Review (tanpa Concern)
+            $finalRec = ($credibilityStatus === 'Normal') ? 'REVIEW' : 'ENHANCED REVIEW';
         }
+
+        // Auto Narrative persis sesuai rumus Excel E63
+        $narrative = self::getRecommendationNarrative($finalRec);
 
         return AssessmentDecision::updateOrCreate(
             ['assessment_id' => $assessment->id],
             [
                 'pfr_category' => $pfrCategory,
                 'ssr_category' => $ssrCategory,
-                'credibility_status' => $flag->sd_flag,
+                'credibility_status' => $credibilityStatus,
                 'final_recommendation' => $finalRec,
                 'auto_narrative' => $narrative,
             ]
         );
+    }
+
+    public static function getRecommendationNarrative(string $finalRec): string
+    {
+        if ($finalRec === 'SUPPORTIVE') {
+            return "Profil psikometrik menunjukkan tingkat prudent financial responsibility dan stakeholder & sustainability responsibility yang tinggi. Tidak terdapat flag kredibilitas respons yang material. Hasil ini mendukung proses asesmen untuk dilanjutkan sesuai SOP BPR.";
+        }
+
+        if (in_array($finalRec, ['CONCERN', 'CONCERN - HIGH PRIORITY REVIEW'])) {
+            return "Ditemukan skor rendah pada salah satu atau lebih dimensi psikometrik. Hasil ini bukan penolakan otomatis, namun menjadi sinyal untuk pendalaman lebih lanjut pada proses asesmen kredit.";
+        }
+
+        // REVIEW, ENHANCED REVIEW, REVIEW - RESPONSE VERIFICATION
+        return "Profil psikometrik secara umum memadai, namun terdapat satu atau lebih aspek yang memerlukan verifikasi tambahan. Petugas disarankan melakukan klarifikasi melalui wawancara dan dokumentasi pendukung sebelum mengambil keputusan kredit.";
+    }
+
+    public static function getPfrNarrative(string $category): string
+    {
+        return match ($category) {
+            'Concern' => "Skor PFR (Prudent Financial Responsibility) di bawah ambang minimum - kehati-hatian dan tanggung jawab finansial nasabah masih rendah. Disarankan pendalaman lebih lanjut pada pengelolaan keuangan nasabah.",
+            'Review' => "Skor PFR berada pada kisaran menengah - kehati-hatian finansial cukup memadai namun belum kuat. Perlu verifikasi tambahan sebelum disimpulkan.",
+            'Supportive' => "Skor PFR tinggi - nasabah menunjukkan kehati-hatian dan tanggung jawab finansial yang kuat, mendukung proses asesmen kredit.",
+            default => "-"
+        };
+    }
+
+    public static function getSsrNarrative(string $category): string
+    {
+        return match ($category) {
+            'Concern' => "Skor SSR (Stakeholder & Sustainability Responsibility) di bawah ambang minimum - orientasi terhadap keberlanjutan dan tanggung jawab ke komunitas/lingkungan masih rendah.",
+            'Review' => "Skor SSR berada pada kisaran menengah - orientasi keberlanjutan cukup, namun belum konsisten kuat.",
+            'Supportive' => "Skor SSR tinggi - nasabah menunjukkan orientasi kuat terhadap keberlanjutan dan tanggung jawab ke pemangku kepentingan.",
+            default => "-"
+        };
+    }
+
+    public static function getSdNarrative(string $flag): string
+    {
+        return match ($flag) {
+            'High' => "Skor Social Desirability sangat tinggi (>= ambang High) - indikasi kuat jawaban bias ke arah citra diri yang ideal. Skor PFR/SSR sebaiknya tidak diandalkan sepenuhnya tanpa klarifikasi langsung ke nasabah.",
+            'Elevated' => "Skor Social Desirability cukup tinggi (di atas ambang Elevated) - ada kecenderungan menjawab secara terlalu ideal/positif. Perlu diverifikasi agar skor SOPI tidak bias.",
+            default => "Pola jawaban terhadap item kontrol Social Desirability wajar, tidak ada indikasi jawaban yang terlalu ideal secara sosial."
+        };
+    }
+
+    public static function getCredibilityNarrative(string $status): string
+    {
+        if ($status === 'Normal') {
+            return "Tidak ditemukan flag kredibilitas - pola jawaban, variasi jawaban, dan Social Desirability berada dalam batas wajar.";
+        }
+        return "Ditemukan satu atau lebih flag kredibilitas (Social Desirability tinggi, pola jawaban seragam/straightlining, dan/atau variasi jawaban terlalu rendah). Skor PFR/SSR perlu dibaca hati-hati dan disertai klarifikasi langsung ke nasabah.";
     }
 
     private function categorizeDimension($score, $p25, $p75)
