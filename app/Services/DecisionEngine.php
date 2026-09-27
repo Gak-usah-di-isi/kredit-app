@@ -58,6 +58,21 @@ class DecisionEngine
 
     public static function getRecommendationNarrative(string $finalRec): string
     {
+        $code = match ($finalRec) {
+            'SUPPORTIVE' => 'REC_SUPPORTIVE',
+            'CONCERN', 'CONCERN - HIGH PRIORITY REVIEW' => 'REC_CONCERN',
+            default => 'REC_REVIEW',
+        };
+
+        try {
+            $opinion = \App\Models\MasterOpinion::where('code', $code)->first();
+            if ($opinion && !empty($opinion->narrative)) {
+                return $opinion->narrative;
+            }
+        } catch (\Throwable $e) {
+            // Fallback jika database belum dimigrasi
+        }
+
         if ($finalRec === 'SUPPORTIVE') {
             return "Profil psikometrik menunjukkan tingkat prudent financial responsibility dan stakeholder & sustainability responsibility yang tinggi. Tidak terdapat flag kredibilitas respons yang material. Hasil ini mendukung proses asesmen untuk dilanjutkan sesuai SOP BPR.";
         }
@@ -72,6 +87,14 @@ class DecisionEngine
 
     public static function getPfrNarrative(string $category): string
     {
+        try {
+            $code = 'PFR_' . strtoupper($category);
+            $opinion = \App\Models\MasterOpinion::where('code', $code)->first();
+            if ($opinion && !empty($opinion->narrative)) {
+                return $opinion->narrative;
+            }
+        } catch (\Throwable $e) {}
+
         return match ($category) {
             'Concern' => "Skor PFR (Prudent Financial Responsibility) di bawah ambang minimum - kehati-hatian dan tanggung jawab finansial nasabah masih rendah. Disarankan pendalaman lebih lanjut pada pengelolaan keuangan nasabah.",
             'Review' => "Skor PFR berada pada kisaran menengah - kehati-hatian finansial cukup memadai namun belum kuat. Perlu verifikasi tambahan sebelum disimpulkan.",
@@ -82,6 +105,14 @@ class DecisionEngine
 
     public static function getSsrNarrative(string $category): string
     {
+        try {
+            $code = 'SSR_' . strtoupper($category);
+            $opinion = \App\Models\MasterOpinion::where('code', $code)->first();
+            if ($opinion && !empty($opinion->narrative)) {
+                return $opinion->narrative;
+            }
+        } catch (\Throwable $e) {}
+
         return match ($category) {
             'Concern' => "Skor SSR (Stakeholder & Sustainability Responsibility) di bawah ambang minimum - orientasi terhadap keberlanjutan dan tanggung jawab ke komunitas/lingkungan masih rendah.",
             'Review' => "Skor SSR berada pada kisaran menengah - orientasi keberlanjutan cukup, namun belum konsisten kuat.",
@@ -92,6 +123,14 @@ class DecisionEngine
 
     public static function getSdNarrative(string $flag): string
     {
+        try {
+            $code = 'SD_' . strtoupper($flag);
+            $opinion = \App\Models\MasterOpinion::where('code', $code)->first();
+            if ($opinion && !empty($opinion->narrative)) {
+                return $opinion->narrative;
+            }
+        } catch (\Throwable $e) {}
+
         return match ($flag) {
             'High' => "Skor Social Desirability sangat tinggi (>= ambang High) - indikasi kuat jawaban bias ke arah citra diri yang ideal. Skor PFR/SSR sebaiknya tidak diandalkan sepenuhnya tanpa klarifikasi langsung ke nasabah.",
             'Elevated' => "Skor Social Desirability cukup tinggi (di atas ambang Elevated) - ada kecenderungan menjawab secara terlalu ideal/positif. Perlu diverifikasi agar skor SOPI tidak bias.",
@@ -101,6 +140,14 @@ class DecisionEngine
 
     public static function getCredibilityNarrative(string $status): string
     {
+        try {
+            $code = ($status === 'Normal') ? 'CRED_NORMAL' : 'CRED_FLAGGED';
+            $opinion = \App\Models\MasterOpinion::where('code', $code)->first();
+            if ($opinion && !empty($opinion->narrative)) {
+                return $opinion->narrative;
+            }
+        } catch (\Throwable $e) {}
+
         if ($status === 'Normal') {
             return "Tidak ditemukan flag kredibilitas - pola jawaban, variasi jawaban, dan Social Desirability berada dalam batas wajar.";
         }

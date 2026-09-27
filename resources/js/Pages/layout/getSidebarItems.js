@@ -33,6 +33,7 @@ export const getSidebarItemsByRole = (roles = []) => {
                         children: [
                             { name: 'Parameter Kalibrasi & Drift', icon: 'solar:tuning-outline', id: uniqueId(), url: '/calibration' },
                             { name: 'Master Item (17 Soal)', icon: 'solar:checklist-minimalistic-outline', id: uniqueId(), url: '/item-masters' },
+                            { name: 'Master Opini & Narasi', icon: 'solar:chat-round-line-outline', id: uniqueId(), url: '/master-opinions' },
                             { name: 'Monitoring Kolektibilitas (Y0)', icon: 'solar:chart-square-outline', id: uniqueId(), url: '/outcome-monitoring' },
                         ],
                     },
@@ -99,9 +100,10 @@ export const getSidebarItemsByRole = (roles = []) => {
                         ],
                     },
                     {
-                        heading: 'PARAMETER KALIBRASI',
+                        heading: 'PARAMETER & MASTER',
                         children: [
                             { name: 'Drift Skor & Rekalibrasi', icon: 'solar:tuning-outline', id: uniqueId(), url: '/calibration' },
+                            { name: 'Master Opini & Narasi', icon: 'solar:chat-round-line-outline', id: uniqueId(), url: '/master-opinions' },
                         ],
                     },
                 ],
@@ -133,6 +135,7 @@ export const getSidebarItemsByRole = (roles = []) => {
                         children: [
                             { name: 'Audit Asesmen & Consent', icon: 'solar:document-text-outline', id: uniqueId(), url: '/assessments' },
                             { name: 'Master Instrumen Baku', icon: 'solar:checklist-minimalistic-outline', id: uniqueId(), url: '/item-masters' },
+                            { name: 'Master Opini & Narasi', icon: 'solar:chat-round-line-outline', id: uniqueId(), url: '/master-opinions' },
                             { name: 'Parameter Model', icon: 'solar:tuning-outline', id: uniqueId(), url: '/calibration' },
                         ],
                     },

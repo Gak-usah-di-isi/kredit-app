@@ -6,6 +6,7 @@ use App\Http\Controllers\AssessmentController;
 use App\Http\Controllers\BorrowerController;
 use App\Http\Controllers\CalibrationController;
 use App\Http\Controllers\ItemMasterController;
+use App\Http\Controllers\MasterOpinionController;
 use App\Http\Controllers\OutcomeMonitoringController;
 use App\Http\Controllers\QuestionnaireController;
 use Illuminate\Foundation\Application;
@@ -104,6 +105,12 @@ Route::middleware('auth')->group(function () {
     Route::middleware('role:admin_sistem|compliance')->group(function () {
         Route::get('/item-masters', [ItemMasterController::class, 'index'])->name('item-masters.index');
         Route::put('/item-masters/{id}', [ItemMasterController::class, 'update'])->name('item-masters.update');
+    });
+
+    // PCSM-SOPI: Master Opini & Narasi Rekomendasi (Admin IT, Manajemen Risiko, & Compliance)
+    Route::middleware('role:admin_sistem|manajemen_risiko|compliance')->group(function () {
+        Route::get('/master-opinions', [MasterOpinionController::class, 'index'])->name('master-opinions.index');
+        Route::put('/master-opinions/{id}', [MasterOpinionController::class, 'update'])->name('master-opinions.update');
     });
 });
 

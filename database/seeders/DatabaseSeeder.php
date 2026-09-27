@@ -28,6 +28,7 @@ class DatabaseSeeder extends Seeder
             ModelVersionSeeder::class,
             CalibrationParameterSeeder::class,
             ItemMasterSeeder::class,
+            MasterOpinionSeeder::class,
         ]);
     }
 }
