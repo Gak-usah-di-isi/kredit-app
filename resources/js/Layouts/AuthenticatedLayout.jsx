@@ -4,9 +4,13 @@ import KreditAppSidebar from '@/Pages/layout/KreditAppSidebar';
 import KreditAppTopbar from '@/Pages/layout/KreditAppTopbar';
 import { getSidebarItemsByRole } from '@/Pages/layout/getSidebarItems';
 import { ToastProvider } from '@/Components/ui/Toast';
+import StandbyModal from '@/Components/StandbyModal';
 
 export default function AuthenticatedLayout({ children, header, sidebarItems }) {
     const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+    const [isStandby, setIsStandby] = useState(() => {
+        return sessionStorage.getItem('kredit_standby_mode') === 'true';
+    });
     const { auth, authUser, authRoles } = usePage().props;
     const currentPath = window.location.pathname;
 
@@ -16,6 +20,16 @@ export default function AuthenticatedLayout({ children, header, sidebarItems }) 
     // Menentukan sidebar berdasarkan role
     const resolvedItems = sidebarItems || getSidebarItemsByRole(roles);
 
+    const activateStandby = () => {
+        setIsStandby(true);
+        sessionStorage.setItem('kredit_standby_mode', 'true');
+    };
+
+    const deactivateStandby = () => {
+        setIsStandby(false);
+        sessionStorage.removeItem('kredit_standby_mode');
+    };
+
     return (
         <ToastProvider>
             <div className="flex w-full h-screen overflow-hidden bg-[#F4F7FB]">
@@ -23,7 +37,7 @@ export default function AuthenticatedLayout({ children, header, sidebarItems }) 
                 <KreditAppSidebar
                     isMobileOpen={isMobileSidebarOpen}
                     onMobileClose={() => setIsMobileSidebarOpen(false)}
-                    onStandByMode={() => {}}
+                    onStandByMode={activateStandby}
                     currentPath={currentPath}
                     items={resolvedItems}
                 />
@@ -45,6 +59,8 @@ export default function AuthenticatedLayout({ children, header, sidebarItems }) 
                         {children}
                     </div>
                 </div>
+
+                <StandbyModal isOpen={isStandby} onClose={deactivateStandby} />
             </div>
         </ToastProvider>
     );
