@@ -6,6 +6,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
+  DropdownMenuLabel,
 } from '../../Components/ui/dropdown-menu';
 import { Avatar, AvatarImage, AvatarFallback } from '../../Components/ui/avatar';
 import { useTheme } from '../../Components/ui/shared/ThemeContext';
@@ -26,6 +27,9 @@ export default function KreditAppTopbar({ onMobileMenuClick }) {
     ? roles[0].replace(/[-_]/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
     : 'Nasabah';
   const isNasabah   = roles.includes('nasabah') || roles.length === 0;
+  const isAdminSistem = roles.includes('admin_sistem');
+  const isPeneliti = roles.includes('peneliti');
+  const isPetugasKredit = roles.includes('petugas_kredit');
   const isParticipant = (roles ?? []).some(r => PARTICIPANT_ROLES.includes(r));
 
   const bar  = dark ? '#1E293B' : '#ffffff';
@@ -64,44 +68,74 @@ export default function KreditAppTopbar({ onMobileMenuClick }) {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button
-              className="h-9 w-9 flex items-center justify-center rounded-lg transition-colors"
+              className="relative h-9 w-9 flex items-center justify-center rounded-lg transition-colors"
               style={{ color: sub }}
               onMouseEnter={e => e.currentTarget.style.background = hover}
               onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
             >
               <Icon icon="solar:bell-outline" width={20} />
+              {/* Dynamic Red Badge Counter */}
+              <span className="absolute top-1.5 right-1.5 flex h-3 w-3 items-center justify-center rounded-full bg-red-500 ring-2 ring-white text-[9px] font-bold text-white">
+                3
+              </span>
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-80">
-            <div className="px-4 py-3 border-b border-gray-100">
-              <h3 className="font-semibold text-sm text-gray-900">Notifications</h3>
-              <p className="text-xs text-gray-500 mt-0.5">You have 3 unread messages</p>
+            <div className="px-4 py-3 border-b border-gray-100 flex justify-between items-center">
+              <div>
+                <h3 className="font-semibold text-sm text-gray-900">Notifikasi Aktivitas Kredit</h3>
+                <p className="text-xs text-gray-500 mt-0.5">3 notifikasi baru belum dibaca</p>
+              </div>
+              <button className="text-xs font-medium text-blue-600 hover:text-blue-800">
+                Tandai Dibaca
+              </button>
             </div>
-            <DropdownMenuItem>
+            
+            <DropdownMenuItem onClick={() => router.visit('/assessments?status=review_officer')}>
               <div className="flex gap-3 py-1">
-                <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
-                  <Icon icon="solar:calendar-outline" className="text-blue-600" width={16} />
+                <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0">
+                  <Icon icon="solar:document-add-outline" className="text-amber-600" width={16} />
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-gray-900">New appointment</p>
-                  <p className="text-xs text-gray-500">Patient scheduled for tomorrow</p>
+                  <p className="text-sm font-medium text-gray-900">📝 Asesmen Membutuhkan Review Officer</p>
+                  <p className="text-xs text-gray-500">Debitur: Bambang Pamungkas (Skor: 68.5 - Perlu Verif)</p>
+                  <p className="text-xs text-gray-400 mt-0.5">15 menit lalu</p>
                 </div>
               </div>
             </DropdownMenuItem>
+            
             <DropdownMenuItem>
               <div className="flex gap-3 py-1">
                 <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
                   <Icon icon="solar:check-circle-outline" className="text-green-600" width={16} />
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-gray-900">Payment received</p>
-                  <p className="text-xs text-gray-500">Rp 500.000 from patient #123</p>
+                  <p className="text-sm font-medium text-gray-900">🎯 Kuesioner Selesai Diisi</p>
+                  <p className="text-xs text-gray-500">Debitur: Siti Nurhaliza telah menyelesaikan 40 butir</p>
+                  <p className="text-xs text-gray-400 mt-0.5">1 jam lalu</p>
                 </div>
               </div>
             </DropdownMenuItem>
-            <div className="px-4 py-3 border-t border-gray-100">
-              <button className="text-xs text-blue-600 hover:underline font-medium">
-                View all notifications
+            
+            <DropdownMenuItem onClick={() => router.visit('/assessments?status=siap_diputus')}>
+              <div className="flex gap-3 py-1">
+                <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+                  <Icon icon="solar:scale-outline" className="text-blue-600" width={16} />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-900">⚖️ Putusan Kredit Diterbitkan</p>
+                  <p className="text-xs text-gray-500">Komite menyetujui pengajuan kredit #CR-2026-089</p>
+                  <p className="text-xs text-gray-400 mt-0.5">2 jam lalu</p>
+                </div>
+              </div>
+            </DropdownMenuItem>
+            
+            <div className="px-4 py-3 border-t border-gray-100 text-center">
+              <button 
+                onClick={() => router.visit('/assessments')} 
+                className="text-xs text-blue-600 hover:underline font-medium"
+              >
+                Lihat Semua Aktivitas Asesmen
               </button>
             </div>
           </DropdownMenuContent>
@@ -109,16 +143,69 @@ export default function KreditAppTopbar({ onMobileMenuClick }) {
 
         {/* Settings (sembunyikan untuk role nasabah) */}
         {!isNasabah && (
-          <a
-            href="/template/pengaturan"
-            className="h-9 w-9 flex items-center justify-center rounded-lg transition-colors"
-            style={{ color: sub }}
-            aria-label="Settings"
-            onMouseEnter={e => e.currentTarget.style.background = hover}
-            onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
-          >
-            <Icon icon="solar:settings-outline" width={20} />
-          </a>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                className="h-9 w-9 flex items-center justify-center rounded-lg transition-colors"
+                style={{ color: sub }}
+                aria-label="Settings"
+                onMouseEnter={e => e.currentTarget.style.background = hover}
+                onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+              >
+                <Icon icon="solar:settings-outline" width={20} />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-64">
+              <DropdownMenuLabel>⚙️ Pengaturan Sistem & Preferensi</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              
+              {(isAdminSistem || isPeneliti) && (
+                <DropdownMenuItem onClick={() => router.visit('/calibration-parameters')}>
+                  <div className="flex flex-col py-1">
+                    <span className="font-medium text-gray-900 flex items-center gap-2">
+                      <Icon icon="solar:graph-up-outline" className="text-gray-500" width={16} />
+                      Kalibrasi Parameter Skoring
+                    </span>
+                    <span className="text-[11px] text-gray-500 ml-6">Bobot dimensi, passing grade, & batas C-W-S</span>
+                  </div>
+                </DropdownMenuItem>
+              )}
+              
+              {(isAdminSistem || isPetugasKredit) && (
+                <DropdownMenuItem onClick={() => router.visit('/item-masters')}>
+                  <div className="flex flex-col py-1">
+                    <span className="font-medium text-gray-900 flex items-center gap-2">
+                      <Icon icon="solar:library-broken" className="text-gray-500" width={16} />
+                      Bank Soal & Item Psikometri
+                    </span>
+                    <span className="text-[11px] text-gray-500 ml-6">Kelola butir soal, dimensi, dan opsi jawaban</span>
+                  </div>
+                </DropdownMenuItem>
+              )}
+              
+              {isAdminSistem && (
+                <DropdownMenuItem onClick={() => router.visit('/users')}>
+                  <div className="flex flex-col py-1">
+                    <span className="font-medium text-gray-900 flex items-center gap-2">
+                      <Icon icon="solar:users-group-two-rounded-outline" className="text-gray-500" width={16} />
+                      Manajemen Pengguna & Hak Akses
+                    </span>
+                    <span className="text-[11px] text-gray-500 ml-6">Kelola akun AO, Supervisor, Pemutus, & IT</span>
+                  </div>
+                </DropdownMenuItem>
+              )}
+              
+              <DropdownMenuItem onClick={() => router.visit('/profile')}>
+                <div className="flex flex-col py-1">
+                  <span className="font-medium text-gray-900 flex items-center gap-2">
+                    <Icon icon="solar:lock-keyhole-outline" className="text-gray-500" width={16} />
+                    Keamanan & Sandi Akun
+                  </span>
+                  <span className="text-[11px] text-gray-500 ml-6">Ubah password & otentikasi sesi staf</span>
+                </div>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         )}
 
         {/* Profile */}
@@ -144,12 +231,12 @@ export default function KreditAppTopbar({ onMobileMenuClick }) {
               <p className="text-xs text-gray-500 mt-0.5">{userRole}</p>
               {userEmail && <p className="text-xs text-gray-400 mt-0.5">{userEmail}</p>}
             </div>
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={() => router.visit('/profile')} className="cursor-pointer">
               <Icon icon="solar:user-outline" className="mr-2" width={16} />
-              Profile
+              Profil Saya
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-red-600" onClick={() => router.post('/logout')}>
+            <DropdownMenuItem className="text-red-600 cursor-pointer" onClick={() => router.post('/logout')}>
               <Icon icon="solar:logout-2-outline" className="mr-2" width={16} />
               Sign Out
             </DropdownMenuItem>
