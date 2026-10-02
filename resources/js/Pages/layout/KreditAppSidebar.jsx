@@ -89,9 +89,17 @@ export default function KreditAppSidebar({
 
   const sidebarContent = (
     <>
-      {/* Logo */}
-      <div className="h-[64px] px-6 flex items-center justify-center" style={{ borderBottom: `1px solid ${bord}` }}>
-        <img src={logoPath || '/images/logo.png'} alt="Kredit App" className="h-9 w-auto object-contain" />
+      {/* Logo & Brand */}
+      <div className="h-[64px] px-5 flex items-center gap-3" style={{ borderBottom: `1px solid ${bord}` }}>
+        <img src={logoPath || '/images/logo.png'} alt="PCSM-SOPI" className="h-8 w-auto object-contain flex-shrink-0" />
+        <div className="flex flex-col min-w-0">
+          <span className="text-[13px] font-bold leading-tight tracking-tight truncate" style={{ color: text, fontFamily: 'Manrope, sans-serif' }}>
+            PCSM-SOPI
+          </span>
+          <span className="text-[10px] leading-tight font-medium truncate" style={{ color: sub, fontFamily: 'Manrope, sans-serif' }}>
+            Sistem Keputusan Kredit
+          </span>
+        </div>
       </div>
 
       {/* Account Status — role info */}
@@ -228,7 +236,17 @@ export default function KreditAppSidebar({
             style={{ background: bg, borderRight: `1px solid ${bord}` }}
           >
             <div className="p-4 flex items-center justify-between" style={{ borderBottom: `1px solid ${bord}` }}>
-              <img src={logoPath || '/images/logo.png'} alt="Kredit App" className="h-8 w-auto object-contain" />
+              <div className="flex items-center gap-2.5 min-w-0">
+                <img src={logoPath || '/images/logo.png'} alt="PCSM-SOPI" className="h-7 w-auto object-contain flex-shrink-0" />
+                <div className="flex flex-col min-w-0">
+                  <span className="text-[12px] font-bold leading-tight tracking-tight truncate" style={{ color: text, fontFamily: 'Manrope, sans-serif' }}>
+                    PCSM-SOPI
+                  </span>
+                  <span className="text-[9px] leading-tight font-medium truncate" style={{ color: sub, fontFamily: 'Manrope, sans-serif' }}>
+                    Sistem Keputusan Kredit
+                  </span>
+                </div>
+              </div>
               <button
                 onClick={onMobileClose}
                 className="p-1 rounded"
