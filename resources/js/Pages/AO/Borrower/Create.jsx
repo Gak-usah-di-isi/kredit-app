@@ -22,7 +22,7 @@ export default function Create({ branch }) {
     };
 
     return (
-        <AuthenticatedLayout header={<h2 className="text-xl font-semibold leading-tight text-gray-800">Tambah Nasabah</h2>}>
+        <AuthenticatedLayout>
             <Head title="Tambah Nasabah" />
             <div className="py-8">
                 <div className="w-full px-4 sm:px-6 lg:px-8">
