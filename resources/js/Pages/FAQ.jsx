@@ -165,10 +165,10 @@ export default function FAQ() {
                     </button>
                 </div>
 
-                {/* FAQ Accordion List */}
-                <div className="bg-white rounded-3xl border border-gray-100 shadow-[0_1px_3px_rgba(0,0,0,0.03)] divide-y divide-gray-100 overflow-hidden">
+                {/* FAQ Accordion List - Card-based with proper breathing room and spacing */}
+                <div className="space-y-4">
                     {filteredFaqs.length === 0 ? (
-                        <div className="py-16 text-center text-gray-400 space-y-2">
+                        <div className="bg-white rounded-2xl border border-gray-100 p-16 text-center text-gray-400 space-y-2">
                             <Icon icon="solar:magnifer-outline" width={32} className="mx-auto text-gray-300" />
                             <p className="text-sm font-medium text-gray-600">Tidak ada pertanyaan yang sesuai pencarian.</p>
                             <p className="text-xs text-gray-400">Coba gunakan kata kunci lain atau pilih kategori Semua Topik.</p>
@@ -177,32 +177,50 @@ export default function FAQ() {
                         filteredFaqs.map((item) => {
                             const isOpen = openItem === item.id;
                             return (
-                                <div key={item.id} className="transition-colors">
+                                <div
+                                    key={item.id}
+                                    className={`bg-white rounded-2xl border transition-all duration-200 overflow-hidden ${
+                                        isOpen
+                                            ? 'border-blue-200 shadow-[0_4px_16px_rgba(1,82,234,0.06)]'
+                                            : 'border-gray-100 shadow-[0_1px_3px_rgba(0,0,0,0.02)] hover:border-gray-200'
+                                    }`}
+                                >
                                     <button
                                         type="button"
                                         onClick={() => toggleAccordion(item.id)}
-                                        className="w-full px-6 py-4.5 text-left flex items-center justify-between gap-4 hover:bg-slate-50/60 transition cursor-pointer"
+                                        className="w-full px-6 py-5 text-left flex items-center justify-between gap-4 hover:bg-slate-50/50 transition cursor-pointer"
                                     >
-                                        <div className="flex items-center gap-3">
-                                            <span className="w-6 h-6 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-xs flex-shrink-0">
+                                        <div className="flex items-center gap-3.5">
+                                            <span className={`w-8 h-8 rounded-xl flex items-center justify-center font-bold text-xs flex-shrink-0 transition-colors ${
+                                                isOpen
+                                                    ? 'bg-blue-600 text-white'
+                                                    : 'bg-blue-50 text-blue-700'
+                                            }`}>
                                                 Q
                                             </span>
-                                            <span className="text-sm font-bold text-gray-900 leading-snug">
+                                            <span className="text-sm md:text-base font-bold text-gray-900 leading-snug">
                                                 {item.question}
                                             </span>
                                         </div>
-                                        <Icon
-                                            icon={isOpen ? 'solar:alt-arrow-up-line-duotone' : 'solar:alt-arrow-down-line-duotone'}
-                                            width={18}
-                                            className={`text-gray-400 flex-shrink-0 transition-transform ${isOpen ? 'text-blue-600' : ''}`}
-                                        />
+                                        <div className={`w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 transition-colors ${
+                                            isOpen ? 'bg-blue-50 text-blue-600' : 'bg-slate-50 text-gray-400'
+                                        }`}>
+                                            <Icon
+                                                icon={isOpen ? 'solar:alt-arrow-up-line-duotone' : 'solar:alt-arrow-down-line-duotone'}
+                                                width={18}
+                                            />
+                                        </div>
                                     </button>
 
                                     {isOpen && (
-                                        <div className="px-6 pb-5 pt-1 text-xs md:text-sm text-gray-600 leading-relaxed pl-15 pr-8 bg-slate-50/40 border-t border-slate-100">
-                                            <div className="flex gap-2">
-                                                <span className="font-semibold text-blue-700 flex-shrink-0">Jawaban:</span>
-                                                <p>{item.answer}</p>
+                                        <div className="px-6 pb-6 pt-3 text-xs md:text-sm text-gray-600 leading-relaxed border-t border-slate-100 bg-[#FAFBFD]">
+                                            <div className="flex items-start gap-3 pl-1">
+                                                <span className="px-2 py-0.5 rounded-md bg-blue-100/70 text-blue-800 font-bold text-[11px] uppercase tracking-wider flex-shrink-0 mt-0.5">
+                                                    Jawaban
+                                                </span>
+                                                <p className="flex-1 leading-relaxed text-gray-700">
+                                                    {item.answer}
+                                                </p>
                                             </div>
                                         </div>
                                     )}
