@@ -103,33 +103,17 @@ export default function KreditAppSidebar({
       </div>
 
       {/* Account Status — role info */}
-      <div className="px-4 pt-4 pb-1">
-        <div
-          className="w-full rounded-xl p-3 py-2.5 transition-colors"
-          style={{ background: clinicBg, border: `1px solid ${clinicBord}` }}
-        >
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div
-                className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0"
-                style={{ background: '#0152EA' }}
-              >
-                <Icon icon="solar:shield-check-bold-duotone" className="text-white" width={16} />
-              </div>
-              <div className="flex flex-col text-left">
-                <span className="text-sm font-semibold leading-tight" style={{ color: text }}>
-                  {getRoleDisplayName(rolesForSidebar)}
-                </span>
-                <span className="text-xs flex items-center gap-1 font-medium mt-0.5 text-emerald-600">
-                  <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                  Terverifikasi
-                </span>
-              </div>
-            </div>
-            <span className="text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded bg-blue-50 text-blue-600 border border-blue-100">
-              Aktif
+      <div className="px-4 pt-3 pb-1">
+        <div className="flex items-center justify-between gap-1.5 px-3 py-2 rounded-xl bg-slate-50/80 border border-slate-200/70">
+          <div className="flex items-center gap-2 min-w-0">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 flex-shrink-0"></span>
+            <span className="text-xs font-semibold text-gray-700 truncate">
+              {getRoleDisplayName(rolesForSidebar)}
             </span>
           </div>
+          <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-md bg-[#D7F5F5] text-[#0E7490]">
+            TERVERIFIKASI
+          </span>
         </div>
       </div>
 
@@ -201,18 +185,41 @@ export default function KreditAppSidebar({
         ))}
       </div>
 
-      {/* Standby Mode */}
-      <div className="p-4 pb-6">
-        <button
-          onClick={() => onStandByMode?.()}
-          className="w-full flex items-center gap-3 px-4 py-3 text-sm rounded-md transition-colors"
-          style={{ color: text, border: `1px solid ${bord}`, background: 'transparent' }}
-          onMouseEnter={e => e.currentTarget.style.background = hover}
-          onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
-        >
-          <Icon icon="solar:power-line-duotone" width={20} style={{ color: sub }} />
-          <span>Standby mode</span>
-        </button>
+      {/* Bottom Area: Sesi Aman + Standby + Logout */}
+      <div className="p-3.5 space-y-2 border-t border-gray-100 mt-auto">
+        {/* Sesi Aman Box */}
+        <div className="p-2.5 bg-white rounded-xl border border-gray-200/80 shadow-[0_1px_2px_rgba(0,0,0,0.04)] flex items-center justify-between">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center flex-shrink-0">
+              <Icon icon="solar:shield-check-outline" width={18} />
+            </div>
+            <div className="flex flex-col min-w-0 text-left">
+              <span className="text-xs font-bold text-gray-900 leading-tight">Sesi Aman</span>
+              <span className="text-[10px] text-gray-400 font-medium leading-tight truncate">Enkripsi Perbankan</span>
+            </div>
+          </div>
+          <Icon icon="solar:lock-outline" width={16} className="text-gray-400 flex-shrink-0" />
+        </div>
+
+        {/* Buttons Row: Standby + Logout */}
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => onStandByMode?.()}
+            className="flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-xl bg-[#EEF2FF] hover:bg-indigo-100 text-[#1E1B4B] text-xs font-semibold transition-colors border border-indigo-100/70"
+          >
+            <Icon icon="solar:moon-sleep-outline" width={16} className="text-indigo-700" />
+            <span>Standby</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => router.post('/logout')}
+            title="Keluar / Logout"
+            className="w-9 h-9 flex items-center justify-center rounded-xl bg-red-50 hover:bg-red-100 text-rose-600 border border-red-100 transition-colors flex-shrink-0"
+          >
+            <Icon icon="solar:logout-2-outline" width={18} />
+          </button>
+        </div>
       </div>
     </>
   );

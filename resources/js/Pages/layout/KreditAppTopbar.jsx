@@ -1,5 +1,5 @@
 import { Icon } from '@iconify/react';
-import { usePage, router } from '@inertiajs/react';
+import { usePage, router, Link } from '@inertiajs/react';
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -55,10 +55,21 @@ export default function KreditAppTopbar({ onMobileMenuClick }) {
           <Icon icon="solar:hamburger-menu-line-duotone" height={24} />
         </button>
 
-        {/* View label (static, no dropdown) */}
-        <div className="hidden lg:flex items-center gap-2 rounded-lg px-2 py-1.5" style={{ color: sub }}>
-          <Icon icon="solar:compass-outline" width={20} style={{ color: sub }} />
-          <span className="text-sm" style={{ color: text }}>Dashboard View</span>
+        {/* Breadcrumbs: SISTEM > Credit Underwriting */}
+        <div className="flex items-center gap-2">
+          <Link
+            href="/dashboard"
+            className="text-xs font-semibold tracking-wider text-gray-500 uppercase hover:text-blue-600 transition-colors"
+          >
+            SISTEM
+          </Link>
+          <span className="text-gray-400 text-xs font-bold">&gt;</span>
+          <Link
+            href="/assessments"
+            className="text-sm font-semibold text-blue-700 hover:text-blue-900 transition-colors"
+          >
+            Credit Underwriting
+          </Link>
         </div>
       </div>
 
@@ -152,7 +163,7 @@ export default function KreditAppTopbar({ onMobileMenuClick }) {
                 onMouseEnter={e => e.currentTarget.style.background = hover}
                 onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
               >
-                <Icon icon="solar:settings-outline" width={20} />
+                <Icon icon="solar:tuning-2-outline" width={20} />
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-64">
@@ -207,6 +218,19 @@ export default function KreditAppTopbar({ onMobileMenuClick }) {
             </DropdownMenuContent>
           </DropdownMenu>
         )}
+
+        {/* Help / FAQ icon */}
+        <button
+          className="h-9 w-9 flex items-center justify-center rounded-lg transition-colors cursor-pointer"
+          style={{ color: sub }}
+          aria-label="Pusat Bantuan & FAQ"
+          title="Pusat Bantuan & FAQ"
+          onClick={() => router.visit('/faq')}
+          onMouseEnter={e => e.currentTarget.style.background = hover}
+          onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+        >
+          <Icon icon="solar:question-circle-outline" width={20} />
+        </button>
 
         {/* Profile */}
         <DropdownMenu>

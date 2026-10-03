@@ -20,7 +20,7 @@ class AssessmentController extends Controller
         // Query berdasarkan role:
         // Petugas Kredit (AO) hanya melihat asesmen miliknya.
         // Pejabat Pemutus, Admin Sistem, Manajemen Risiko, dan Kepatuhan melihat seluruh asesmen.
-        $query = Assessment::with(['borrower', 'decision', 'officer'])->latest();
+        $query = Assessment::with(['borrower', 'decision', 'officer', 'score'])->latest();
 
         if ($user->hasRole('petugas_kredit') && !$user->hasRole(['admin_sistem', 'pejabat_pemutus'])) {
             $query->where('officer_id', $user->id);

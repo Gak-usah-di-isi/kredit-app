@@ -9,6 +9,7 @@ use App\Http\Controllers\ItemMasterController;
 use App\Http\Controllers\MasterOpinionController;
 use App\Http\Controllers\OutcomeMonitoringController;
 use App\Http\Controllers\QuestionnaireController;
+use App\Http\Controllers\FaqController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -71,6 +72,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::get('/faq', [FaqController::class, 'index'])->name('faq');
 
     // PCSM-SOPI: Borrowers - Hak akses role
     Route::middleware('role:petugas_kredit|pejabat_pemutus|admin_sistem|manajemen_risiko')->group(function () {
