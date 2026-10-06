@@ -62,7 +62,8 @@ export default function Index({ opinions = [], categories = [], filters = {} }) 
         return {
             total: opinions.length,
             recommendation: opinions.filter((o) => o.category === 'Rekomendasi Utama').length,
-            dimensions: opinions.filter((o) => o.category === 'Dimensi PFR' || o.category === 'Dimensi SSR').length,
+            pfr: opinions.filter((o) => o.category === 'Dimensi PFR').length,
+            ssr: opinions.filter((o) => o.category === 'Dimensi SSR').length,
             credibility: opinions.filter((o) => o.category === 'Kredibilitas Respon').length,
             disclaimer: opinions.filter((o) => o.category === 'Disclaimer').length,
         };
@@ -177,7 +178,7 @@ export default function Index({ opinions = [], categories = [], filters = {} }) 
                             <span className={`text-[11px] block font-semibold uppercase tracking-wider ${selectedCategory === 'Dimensi PFR' ? 'text-blue-100' : 'text-blue-600'}`}>
                                 Dimensi PFR
                             </span>
-                            <div className="text-2xl font-black mt-1">3</div>
+                            <div className="text-2xl font-black mt-1">{stats.pfr}</div>
                             <span className={`text-[11px] block mt-0.5 ${selectedCategory === 'Dimensi PFR' ? 'text-blue-100' : 'text-gray-400'}`}>Tanggung Jawab Keuangan</span>
                         </div>
 
@@ -192,7 +193,7 @@ export default function Index({ opinions = [], categories = [], filters = {} }) 
                             <span className={`text-[11px] block font-semibold uppercase tracking-wider ${selectedCategory === 'Dimensi SSR' ? 'text-teal-100' : 'text-teal-600'}`}>
                                 Dimensi SSR
                             </span>
-                            <div className="text-2xl font-black mt-1">3</div>
+                            <div className="text-2xl font-black mt-1">{stats.ssr}</div>
                             <span className={`text-[11px] block mt-0.5 ${selectedCategory === 'Dimensi SSR' ? 'text-teal-100' : 'text-gray-400'}`}>Keberlanjutan & Bisnis</span>
                         </div>
 
