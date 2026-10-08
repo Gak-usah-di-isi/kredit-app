@@ -32,6 +32,17 @@ class CalibrationController extends Controller
         $scores = AssessmentScore::all();
         $count = $scores->count();
 
+        $pfrValues = $scores->pluck('pfr_100')->toArray();
+        $ssrValues = $scores->pluck('ssr_100')->toArray();
+        $sdValues = $scores->pluck('sd_100')->toArray();
+
+        $pfrP25 = $this->calculatePercentile($pfrValues, 25);
+        $pfrP75 = $this->calculatePercentile($pfrValues, 75);
+        $ssrP25 = $this->calculatePercentile($ssrValues, 25);
+        $ssrP75 = $this->calculatePercentile($ssrValues, 75);
+        $sdP75 = $this->calculatePercentile($sdValues, 75);
+        $sdP90 = $this->calculatePercentile($sdValues, 90);
+
         $driftStats = [
             'total_scored' => $count,
             'pfr_avg' => $count > 0 ? round($scores->avg('pfr_100'), 2) : 0,
@@ -39,12 +50,20 @@ class CalibrationController extends Controller
             'sd_avg' => $count > 0 ? round($scores->avg('sd_100'), 2) : 0,
             'overall_avg' => $count > 0 ? round($scores->avg('overall_sopi_100'), 2) : 0,
             // Perhitungan persentil riil populasi
-            'real_pfr_p25' => $this->calculatePercentile($scores->pluck('pfr_100')->toArray(), 25),
-            'real_pfr_p75' => $this->calculatePercentile($scores->pluck('pfr_100')->toArray(), 75),
-            'real_ssr_p25' => $this->calculatePercentile($scores->pluck('ssr_100')->toArray(), 25),
-            'real_ssr_p75' => $this->calculatePercentile($scores->pluck('ssr_100')->toArray(), 75),
-            'real_sd_p75'  => $this->calculatePercentile($scores->pluck('sd_100')->toArray(), 75),
-            'real_sd_p90'  => $this->calculatePercentile($scores->pluck('sd_100')->toArray(), 90),
+            'real_pfr_p25' => $pfrP25,
+            'real_pfr_p75' => $pfrP75,
+            'real_ssr_p25' => $ssrP25,
+            'real_ssr_p75' => $ssrP75,
+            'real_sd_p75'  => $sdP75,
+            'real_sd_p90'  => $sdP90,
+            // Variance (sampel) per dimensi
+            'pfr_variance' => $this->calculateVariance($pfrValues),
+            'ssr_variance' => $this->calculateVariance($ssrValues),
+            'sd_variance'  => $this->calculateVariance($sdValues),
+            // Population Stability Index (PSI) model vs distribusi riil
+            'pfr_psi' => $this->calculatePsi($pfrValues, $activeParams?->pfr_p25, $activeParams?->pfr_p75),
+            'ssr_psi' => $this->calculatePsi($ssrValues, $activeParams?->ssr_p25, $activeParams?->ssr_p75),
+            'sd_psi'  => $this->calculatePsi($sdValues, $activeParams?->sd_p75, $activeParams?->sd_p90, [0.75, 0.90]),
         ];
 
         return Inertia::render('Admin/Calibration/Index', [
@@ -120,5 +139,54 @@ class CalibrationController extends Controller
         $high = ceil($index);
         $weight = $index - $low;
         return round($data[$low] + $weight * ($data[$high] - $data[$low]), 2);
+    }
+
+    private function calculateVariance(array $data): float
+    {
+        $count = count($data);
+        if ($count < 2) return 0;
+        $mean = array_sum($data) / $count;
+        $sum = 0;
+        foreach ($data as $value) {
+            $sum += pow($value - $mean, 2);
+        }
+        return round($sum / ($count - 1), 2);
+    }
+
+    /**
+     * PSI dua bin di sekitar dua ambang model (expected share mengikuti
+     * definisi persentil: mis. P25/P75 -> 25% / 50% / 25%).
+     * default $cuts = [25, 75] dan $shares = [0.25, 0.50, 0.25].
+     */
+    private function calculatePsi(array $data, ?float $cutLow, ?float $cutHigh, ?array $shares = null): float
+    {
+        if (empty($data) || $cutLow === null || $cutHigh === null) return 0;
+
+        $shares = $shares ?? [0.25, 0.50, 0.25];
+        $actual = [0, 0, 0];
+        foreach ($data as $value) {
+            if ($value < $cutLow) {
+                $actual[0]++;
+            } elseif ($value < $cutHigh) {
+                $actual[1]++;
+            } else {
+                $actual[2]++;
+            }
+        }
+
+        $total = count($data);
+        $psi = 0;
+        foreach ($shares as $index => $expectedShare) {
+            $expected = $expectedShare * $total;
+            $observed = $actual[$index];
+            if ($expected <= 0 || $observed <= 0) {
+                // Laplace smoothing agar PSI tetap terdefinisi pada bin kosong.
+                $expected = max($expected, 0.5);
+                $observed = max($observed, 0.5);
+            }
+            $psi += ($observed / $total - $expectedShare) * log(($observed / $total) / $expectedShare);
+        }
+
+        return round($psi, 4);
     }
 }
