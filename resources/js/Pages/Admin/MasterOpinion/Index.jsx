@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, useForm, router } from '@inertiajs/react';
+import { Head, useForm } from '@inertiajs/react';
 import { Icon } from '@iconify/react';
 
 export default function Index({ opinions = [], categories = [], filters = {} }) {
@@ -65,165 +65,201 @@ export default function Index({ opinions = [], categories = [], filters = {} }) 
             pfr: opinions.filter((o) => o.category === 'Dimensi PFR').length,
             ssr: opinions.filter((o) => o.category === 'Dimensi SSR').length,
             credibility: opinions.filter((o) => o.category === 'Kredibilitas Respon').length,
-            disclaimer: opinions.filter((o) => o.category === 'Disclaimer').length,
         };
     }, [opinions]);
 
     const getBadgeStyle = (code) => {
         if (code.includes('SUPPORTIVE') || code.includes('NORMAL')) {
-            return 'bg-emerald-50 text-emerald-700 border-emerald-200';
+            return 'bg-secondary-fixed text-on-secondary-fixed';
         }
-        if (code.includes('CONCERN') || code.includes('HIGH') || code.includes('FLAGGED')) {
-            return 'bg-rose-50 text-rose-700 border-rose-200';
+        if (code.includes('CONCERN') || code.includes('HIGH') || code.includes('FLAGGED') || code.includes('VERIFICATION')) {
+            return 'bg-error-container text-on-error-container';
         }
         if (code.includes('REVIEW') || code.includes('ELEVATED')) {
-            return 'bg-amber-50 text-amber-700 border-amber-200';
+            return 'bg-tertiary-fixed text-on-tertiary-fixed';
         }
-        return 'bg-indigo-50 text-indigo-700 border-indigo-200';
+        return 'bg-primary-fixed text-on-primary-fixed-variant';
     };
 
-    const getCategoryIcon = (cat) => {
-        switch (cat) {
-            case 'Rekomendasi Utama':
-                return 'solar:shield-check-bold-duotone';
-            case 'Dimensi PFR':
-                return 'solar:wallet-money-bold-duotone';
-            case 'Dimensi SSR':
-                return 'solar:chart-2-bold-duotone';
-            case 'Kredibilitas Respon':
-                return 'solar:user-speak-rounded-bold-duotone';
-            case 'Disclaimer':
-                return 'solar:info-circle-bold-duotone';
-            default:
-                return 'solar:document-text-bold-duotone';
-        }
-    };
+    const statCardBase =
+        'rounded-xl p-space-md flex flex-col justify-between text-left transition-all';
 
     return (
-        <AuthenticatedLayout
-            header={
-                <div className="flex items-center justify-between">
-                    <div>
-                        <h2 className="text-xl font-bold leading-tight text-gray-900">
-                            Master Opini & Narasi Rekomendasi
-                        </h2>
-                        <p className="text-xs text-gray-500 mt-1">
-                            Manajemen konfigurasi teks rekomendasi, interpretasi psikometrik, dan narasi keputusan kredit PCSM-SOPI di database.
-                        </p>
-                    </div>
-                </div>
-            }
-        >
+        <AuthenticatedLayout>
             <Head title="Master Opini & Narasi Rekomendasi" />
 
-            <div className="py-8">
-                <div className="mx-auto max-w-7xl sm:px-6 lg:px-8 space-y-6">
-                    {/* Info Banner */}
-                    <div className="rounded-2xl border border-blue-100 bg-gradient-to-r from-blue-50/70 via-indigo-50/50 to-blue-50/30 p-5 shadow-sm">
-                        <div className="flex items-start gap-3">
-                            <div className="rounded-xl bg-blue-600 p-2.5 text-white shadow-sm flex-shrink-0">
+            <div className="w-full min-h-full bg-background font-body-md text-on-surface">
+                <div className="flex flex-col w-full gap-space-lg px-space-lg py-space-md pb-12">
+                    {/* Title & Description Header */}
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-space-md">
+                        <div className="flex flex-col">
+                            <h1 className="font-headline-xl text-headline-xl text-on-surface font-bold tracking-tight">
+                                Master Opini &amp; Narasi Rekomendasi
+                            </h1>
+                            <p className="font-body-md text-body-md text-on-surface-variant mt-1">
+                                Manajemen konfigurasi teks rekomendasi, interpretasi psikometrik, dan narasi keputusan kredit PCSM-SOPI di database.
+                            </p>
+                        </div>
+                        <div className="flex items-center gap-space-sm self-start md:self-auto">
+                            <button
+                                type="button"
+                                disabled
+                                title="Segera hadir — fitur riwayat versi sedang disiapkan"
+                                className="inline-flex items-center gap-2 px-space-md py-2 rounded-lg bg-surface-container-lowest text-on-surface shadow-sm font-label-md text-label-md cursor-not-allowed opacity-60"
+                            >
+                                <Icon icon="solar:history-outline" className="w-[18px] h-[18px] text-outline" />
+                                Riwayat Versi
+                            </button>
+                            <button
+                                type="button"
+                                disabled
+                                title="Segera hadir — endpoint tambah template belum tersedia"
+                                className="inline-flex items-center gap-2 px-space-md py-2 rounded-lg bg-primary-container text-on-primary shadow-sm font-label-md text-label-md cursor-not-allowed opacity-60"
+                            >
+                                <Icon icon="solar:add-circle-outline" className="w-[18px] h-[18px]" />
+                                Tambah Template
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Database Synchronization Notice Banner */}
+                    <div className="relative overflow-hidden rounded-xl bg-surface-container-low p-space-lg shadow-sm">
+                        <div className="flex items-start gap-space-md">
+                            <div className="w-12 h-12 rounded-xl bg-primary flex items-center justify-center text-on-primary shrink-0 shadow-md">
                                 <Icon icon="solar:database-outline" className="w-6 h-6" />
                             </div>
-                            <div className="text-sm">
-                                <h4 className="font-bold text-gray-900">
-                                    Penyimpanan Terpusat & Fleksibel di Database
-                                </h4>
-                                <p className="text-xs text-gray-600 mt-0.5 leading-relaxed">
-                                    Semua narasi pada halaman ini tersimpan di tabel database <code className="px-1.5 py-0.5 rounded bg-blue-100 text-blue-800 font-mono text-xs">master_opinions</code>. Kalimat rekomendasi, narasi PFR/SSR, maupun catatan integritas respon yang diubah di sini akan otomatis diterapkan oleh sistem kalkulasi <code className="px-1.5 py-0.5 rounded bg-blue-100 text-blue-800 font-mono text-xs">DecisionEngine</code> pada setiap asesmen kredit yang dianalisis.
+                            <div className="flex flex-col gap-1.5 flex-1 pr-4">
+                                <div className="flex items-center gap-2 flex-wrap">
+                                    <h2 className="font-headline-md text-headline-md text-on-surface font-bold">
+                                        Penyimpanan Terpusat &amp; Fleksibel di Database
+                                    </h2>
+                                    <span className="px-2 py-0.5 rounded-full bg-secondary-fixed text-on-secondary-fixed font-label-sm text-[10px] uppercase font-bold tracking-wider">
+                                        Sync Active
+                                    </span>
+                                </div>
+                                <p className="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+                                    Semua narasi pada halaman ini tersimpan di tabel database{' '}
+                                    <code className="px-1.5 py-0.5 rounded bg-surface-container-high text-primary font-data-mono text-data-mono font-medium">master_opinions</code>. Kalimat rekomendasi, narasi PFR/SSR, maupun catatan integritas respon yang diubah di sini akan otomatis diterapkan oleh sistem kalkulasi{' '}
+                                    <code className="px-1.5 py-0.5 rounded bg-primary-fixed text-on-primary-fixed-variant font-data-mono text-data-mono font-semibold">DecisionEngine</code> pada setiap asesmen kredit yang dianalisis.
                                 </p>
                             </div>
                         </div>
                     </div>
 
-                    {/* Stats Overview */}
-                    <div className="grid grid-cols-2 sm:grid-cols-5 gap-3.5">
-                        <div
+                    {/* Summary Metric Cards (5 Cards) */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-space-md">
+                        {/* Total Template (Highlighted Active) */}
+                        <button
+                            type="button"
                             onClick={() => setSelectedCategory('ALL')}
-                            className={`p-4 rounded-xl border cursor-pointer transition shadow-sm ${
-                                selectedCategory === 'ALL'
-                                    ? 'bg-blue-600 text-white border-blue-600'
-                                    : 'bg-white text-gray-800 border-gray-100 hover:border-gray-300'
-                            }`}
+                            className={`${statCardBase} bg-primary text-on-primary shadow-md relative overflow-hidden group cursor-pointer hover:-translate-y-0.5 ${selectedCategory === 'ALL' ? 'ring-2 ring-primary-fixed-dim' : ''}`}
                         >
-                            <span className={`text-[11px] block font-semibold uppercase tracking-wider ${selectedCategory === 'ALL' ? 'text-blue-100' : 'text-gray-400'}`}>
-                                Total Template
-                            </span>
-                            <div className="text-2xl font-black mt-1">{stats.total}</div>
-                            <span className={`text-[11px] block mt-0.5 ${selectedCategory === 'ALL' ? 'text-blue-100' : 'text-gray-400'}`}>Semua Narasi</span>
-                        </div>
+                            <div className="absolute -right-3 -bottom-3 text-on-primary/10 select-none pointer-events-none">
+                                <Icon icon="solar:book-bold-duotone" className="w-[80px] h-[80px]" />
+                            </div>
+                            <div className="flex items-center justify-between z-10">
+                                <span className="font-label-sm text-label-sm uppercase tracking-wider text-on-primary-container">
+                                    Total Template
+                                </span>
+                                <Icon icon="solar:layers-outline" className="w-5 h-5 text-on-primary-container" />
+                            </div>
+                            <div className="mt-4 z-10 text-left">
+                                <span className="font-headline-xl text-headline-xl font-bold tracking-tight block leading-none">{stats.total}</span>
+                                <span className="font-body-sm text-body-sm text-on-primary/80 mt-1 block">Semua Narasi</span>
+                            </div>
+                        </button>
 
-                        <div
+                        {/* Rekomendasi Utama */}
+                        <button
+                            type="button"
                             onClick={() => setSelectedCategory('Rekomendasi Utama')}
-                            className={`p-4 rounded-xl border cursor-pointer transition shadow-sm ${
-                                selectedCategory === 'Rekomendasi Utama'
-                                    ? 'bg-emerald-600 text-white border-emerald-600'
-                                    : 'bg-white text-gray-800 border-gray-100 hover:border-emerald-200'
-                            }`}
+                            className={`${statCardBase} bg-surface-container-lowest shadow-sm hover:shadow-md ${selectedCategory === 'Rekomendasi Utama' ? 'ring-2 ring-primary/40' : ''}`}
                         >
-                            <span className={`text-[11px] block font-semibold uppercase tracking-wider ${selectedCategory === 'Rekomendasi Utama' ? 'text-emerald-100' : 'text-emerald-600'}`}>
-                                Rekomendasi Utama
-                            </span>
-                            <div className="text-2xl font-black mt-1">{stats.recommendation}</div>
-                            <span className={`text-[11px] block mt-0.5 ${selectedCategory === 'Rekomendasi Utama' ? 'text-emerald-100' : 'text-gray-400'}`}>Supportive / Review / Concern</span>
-                        </div>
+                            <div className="flex items-center justify-between">
+                                <span className="font-label-sm text-label-sm uppercase tracking-wider text-outline">
+                                    Rekomendasi Utama
+                                </span>
+                                <div className="w-7 h-7 rounded-lg bg-surface-container-high flex items-center justify-center text-primary">
+                                    <Icon icon="solar:check-circle-bold" className="w-4 h-4" />
+                                </div>
+                            </div>
+                            <div className="mt-4">
+                                <span className="font-headline-xl text-headline-xl font-bold text-on-surface block leading-none">{stats.recommendation}</span>
+                                <span className="font-body-sm text-body-sm text-on-surface-variant mt-1 block truncate">Supportive / Review / Concern</span>
+                            </div>
+                        </button>
 
-                        <div
+                        {/* Dimensi PFR */}
+                        <button
+                            type="button"
                             onClick={() => setSelectedCategory('Dimensi PFR')}
-                            className={`p-4 rounded-xl border cursor-pointer transition shadow-sm ${
-                                selectedCategory === 'Dimensi PFR'
-                                    ? 'bg-blue-700 text-white border-blue-700'
-                                    : 'bg-white text-gray-800 border-gray-100 hover:border-blue-200'
-                            }`}
+                            className={`${statCardBase} bg-surface-container-lowest shadow-sm hover:shadow-md ${selectedCategory === 'Dimensi PFR' ? 'ring-2 ring-secondary/40' : ''}`}
                         >
-                            <span className={`text-[11px] block font-semibold uppercase tracking-wider ${selectedCategory === 'Dimensi PFR' ? 'text-blue-100' : 'text-blue-600'}`}>
-                                Dimensi PFR
-                            </span>
-                            <div className="text-2xl font-black mt-1">{stats.pfr}</div>
-                            <span className={`text-[11px] block mt-0.5 ${selectedCategory === 'Dimensi PFR' ? 'text-blue-100' : 'text-gray-400'}`}>Tanggung Jawab Keuangan</span>
-                        </div>
+                            <div className="flex items-center justify-between">
+                                <span className="font-label-sm text-label-sm uppercase tracking-wider text-outline">
+                                    Dimensi PFR
+                                </span>
+                                <div className="w-7 h-7 rounded-lg bg-surface-container-high flex items-center justify-center text-secondary">
+                                    <Icon icon="solar:wallet-money-bold-duotone" className="w-4 h-4" />
+                                </div>
+                            </div>
+                            <div className="mt-4">
+                                <span className="font-headline-xl text-headline-xl font-bold text-on-surface block leading-none">{stats.pfr}</span>
+                                <span className="font-body-sm text-body-sm text-on-surface-variant mt-1 block truncate">Tanggung Jawab Keuangan</span>
+                            </div>
+                        </button>
 
-                        <div
+                        {/* Dimensi SSR */}
+                        <button
+                            type="button"
                             onClick={() => setSelectedCategory('Dimensi SSR')}
-                            className={`p-4 rounded-xl border cursor-pointer transition shadow-sm ${
-                                selectedCategory === 'Dimensi SSR'
-                                    ? 'bg-teal-700 text-white border-teal-700'
-                                    : 'bg-white text-gray-800 border-gray-100 hover:border-teal-200'
-                            }`}
+                            className={`${statCardBase} bg-surface-container-lowest shadow-sm hover:shadow-md ${selectedCategory === 'Dimensi SSR' ? 'ring-2 ring-tertiary/40' : ''}`}
                         >
-                            <span className={`text-[11px] block font-semibold uppercase tracking-wider ${selectedCategory === 'Dimensi SSR' ? 'text-teal-100' : 'text-teal-600'}`}>
-                                Dimensi SSR
-                            </span>
-                            <div className="text-2xl font-black mt-1">{stats.ssr}</div>
-                            <span className={`text-[11px] block mt-0.5 ${selectedCategory === 'Dimensi SSR' ? 'text-teal-100' : 'text-gray-400'}`}>Keberlanjutan & Bisnis</span>
-                        </div>
+                            <div className="flex items-center justify-between">
+                                <span className="font-label-sm text-label-sm uppercase tracking-wider text-outline">
+                                    Dimensi SSR
+                                </span>
+                                <div className="w-7 h-7 rounded-lg bg-surface-container-high flex items-center justify-center text-tertiary">
+                                    <Icon icon="solar:shop-outline" className="w-4 h-4" />
+                                </div>
+                            </div>
+                            <div className="mt-4">
+                                <span className="font-headline-xl text-headline-xl font-bold text-on-surface block leading-none">{stats.ssr}</span>
+                                <span className="font-body-sm text-body-sm text-on-surface-variant mt-1 block truncate">Keberlanjutan &amp; Bisnis</span>
+                            </div>
+                        </button>
 
-                        <div
+                        {/* Kredibilitas & SD */}
+                        <button
+                            type="button"
                             onClick={() => setSelectedCategory('Kredibilitas Respon')}
-                            className={`p-4 rounded-xl border cursor-pointer transition shadow-sm col-span-2 sm:col-span-1 ${
-                                selectedCategory === 'Kredibilitas Respon'
-                                    ? 'bg-amber-600 text-white border-amber-600'
-                                    : 'bg-white text-gray-800 border-gray-100 hover:border-amber-200'
-                            }`}
+                            className={`${statCardBase} bg-surface-container-lowest shadow-sm hover:shadow-md col-span-2 sm:col-span-1 ${selectedCategory === 'Kredibilitas Respon' ? 'ring-2 ring-on-tertiary-fixed-variant/40' : ''}`}
                         >
-                            <span className={`text-[11px] block font-semibold uppercase tracking-wider ${selectedCategory === 'Kredibilitas Respon' ? 'text-amber-100' : 'text-amber-600'}`}>
-                                Kredibilitas & SD
-                            </span>
-                            <div className="text-2xl font-black mt-1">{stats.credibility}</div>
-                            <span className={`text-[11px] block mt-0.5 ${selectedCategory === 'Kredibilitas Respon' ? 'text-amber-100' : 'text-gray-400'}`}>Integritas & Kejujuran</span>
-                        </div>
+                            <div className="flex items-center justify-between">
+                                <span className="font-label-sm text-label-sm uppercase tracking-wider text-outline">
+                                    Kredibilitas &amp; SD
+                                </span>
+                                <div className="w-7 h-7 rounded-lg bg-surface-container-high flex items-center justify-center text-on-tertiary-fixed-variant">
+                                    <Icon icon="solar:user-speak-rounded-bold-duotone" className="w-4 h-4" />
+                                </div>
+                            </div>
+                            <div className="mt-4">
+                                <span className="font-headline-xl text-headline-xl font-bold text-on-surface block leading-none">{stats.credibility}</span>
+                                <span className="font-body-sm text-body-sm text-on-surface-variant mt-1 block truncate">Integritas &amp; Kejujuran</span>
+                            </div>
+                        </button>
                     </div>
 
-                    {/* Filter & Search Bar */}
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
-                        {/* Tabs Kategori */}
-                        <div className="flex flex-wrap items-center gap-1.5">
+                    {/* Interactive Controls: Filter Pills & Search */}
+                    <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-space-md">
+                        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 lg:pb-0">
                             <button
                                 type="button"
                                 onClick={() => setSelectedCategory('ALL')}
-                                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
+                                className={`px-4 py-2 rounded-full font-label-md text-label-md transition-colors whitespace-nowrap ${
                                     selectedCategory === 'ALL'
-                                        ? 'bg-gray-900 text-white shadow-sm'
-                                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                        ? 'bg-on-surface text-surface-container-lowest font-medium shadow-sm'
+                                        : 'bg-surface-container-lowest text-on-surface-variant hover:bg-surface-container-high font-medium'
                                 }`}
                             >
                                 Semua ({opinions.length})
@@ -233,10 +269,10 @@ export default function Index({ opinions = [], categories = [], filters = {} }) 
                                     key={cat}
                                     type="button"
                                     onClick={() => setSelectedCategory(cat)}
-                                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
+                                    className={`px-4 py-2 rounded-full font-label-md text-label-md transition-colors whitespace-nowrap ${
                                         selectedCategory === cat
-                                            ? 'bg-blue-600 text-white shadow-sm'
-                                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                            ? 'bg-on-surface text-surface-container-lowest font-medium shadow-sm'
+                                            : 'bg-surface-container-lowest text-on-surface-variant hover:bg-surface-container-high font-medium'
                                     }`}
                                 >
                                     {cat}
@@ -245,93 +281,97 @@ export default function Index({ opinions = [], categories = [], filters = {} }) 
                         </div>
 
                         {/* Search Input */}
-                        <div className="relative w-full sm:w-72">
+                        <div className="relative w-full lg:w-80 shrink-0">
                             <Icon
                                 icon="solar:magnifer-outline"
-                                className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                                className="w-[18px] h-[18px] absolute left-3 top-1/2 -translate-y-1/2 text-outline"
                             />
                             <input
                                 type="text"
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 placeholder="Cari template narasi / kode..."
-                                className="w-full pl-9 pr-3 py-1.5 text-xs rounded-lg border border-gray-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                                className="w-full pl-9 pr-9 py-2 text-body-sm bg-surface-container-lowest rounded-xl text-on-surface placeholder:text-outline shadow-sm focus:outline-none focus:ring-2 focus:ring-primary transition-all border-0"
                             />
                             {searchQuery && (
                                 <button
                                     type="button"
                                     onClick={() => setSearchQuery('')}
-                                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-outline hover:text-on-surface"
                                 >
-                                    <Icon icon="solar:close-circle-bold" className="w-3.5 h-3.5" />
+                                    <Icon icon="solar:close-circle-bold" className="w-4 h-4" />
                                 </button>
                             )}
                         </div>
                     </div>
 
-                    {/* Opinions List Cards */}
-                    <div className="space-y-4">
+                    {/* Narrative Template Cards */}
+                    <div className="flex flex-col gap-space-md">
                         {filteredOpinions.length === 0 ? (
-                            <div className="bg-white rounded-xl border border-gray-100 p-12 text-center shadow-sm">
-                                <Icon icon="solar:clipboard-remove-outline" className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                                <h3 className="text-sm font-semibold text-gray-700">Tidak ada template opini yang sesuai</h3>
-                                <p className="text-xs text-gray-400 mt-1">Coba sesuaikan kata kunci pencarian atau kategori yang dipilih.</p>
+                            <div className="rounded-xl bg-surface-container-lowest p-12 text-center shadow-sm">
+                                <Icon icon="solar:clipboard-remove-outline" className="w-12 h-12 text-outline-variant mx-auto mb-3" />
+                                <h3 className="font-headline-md text-headline-md text-on-surface font-bold">
+                                    Tidak ada template opini yang sesuai
+                                </h3>
+                                <p className="font-body-md text-body-md text-on-surface-variant mt-1">
+                                    Coba sesuaikan kata kunci pencarian atau kategori yang dipilih.
+                                </p>
                             </div>
                         ) : (
                             filteredOpinions.map((item) => (
                                 <div
                                     key={item.id}
-                                    className="bg-white rounded-xl border border-gray-100 shadow-sm p-5 hover:border-gray-200 transition"
+                                    className="rounded-xl bg-surface-container-lowest p-space-lg shadow-sm hover:shadow-md transition-shadow"
                                 >
-                                    <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
-                                        <div className="space-y-2.5 flex-1">
-                                            {/* Badges & Meta */}
-                                            <div className="flex flex-wrap items-center gap-2">
-                                                <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold border font-mono ${getBadgeStyle(item.code)}`}>
+                                    <div className="flex flex-col gap-space-md">
+                                        {/* Card Top Bar: Badges + Action */}
+                                        <div className="flex items-center justify-between flex-wrap gap-2">
+                                            <div className="flex items-center gap-2">
+                                                <span className={`px-2.5 py-1 rounded-full font-data-mono text-[11px] font-bold tracking-wider ${getBadgeStyle(item.code)}`}>
                                                     {item.code}
                                                 </span>
-                                                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-xs font-medium bg-gray-100 text-gray-600">
-                                                    <Icon icon={getCategoryIcon(item.category)} className="w-3.5 h-3.5" />
+                                                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-surface-container-high text-on-surface-variant font-label-sm text-[11px]">
+                                                    <Icon icon="solar:folder-outline" className="w-[13px] h-[13px]" />
                                                     {item.category}
                                                 </span>
                                             </div>
-
-                                            {/* Title */}
-                                            <h3 className="text-base font-bold text-gray-900">
-                                                {item.title}
-                                            </h3>
-
-                                            {/* Narrative text display */}
-                                            <div className="bg-gray-50/80 rounded-xl p-4 border border-gray-100">
-                                                <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1 flex items-center gap-1.5">
-                                                    <Icon icon="solar:chat-line-outline" className="w-3.5 h-3.5 text-blue-500" />
-                                                    Template Kalimat Rekomendasi
-                                                </div>
-                                                <p className="text-sm text-gray-800 leading-relaxed font-normal whitespace-pre-wrap">
-                                                    "{item.narrative}"
-                                                </p>
-                                            </div>
-
-                                            {/* Technical Note / Description */}
-                                            {item.description && (
-                                                <div className="flex items-start gap-1.5 text-xs text-gray-500 pl-1">
-                                                    <Icon icon="solar:info-circle-linear" className="w-3.5 h-3.5 text-gray-400 mt-0.5 flex-shrink-0" />
-                                                    <span>{item.description}</span>
-                                                </div>
-                                            )}
-                                        </div>
-
-                                        {/* Action Button */}
-                                        <div className="flex-shrink-0 pt-1">
                                             <button
                                                 type="button"
                                                 onClick={() => handleEdit(item)}
-                                                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold text-blue-600 hover:text-white bg-blue-50 hover:bg-blue-600 border border-blue-100 transition shadow-sm"
+                                                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-container-low hover:bg-surface-container-high text-primary font-label-md text-label-md font-semibold transition-colors"
                                             >
                                                 <Icon icon="solar:pen-new-square-outline" className="w-4 h-4" />
                                                 Edit Narasi
                                             </button>
                                         </div>
+
+                                        {/* Title */}
+                                        <div>
+                                            <h3 className="font-headline-md text-headline-md font-bold text-on-surface tracking-tight">
+                                                {item.title}
+                                            </h3>
+                                        </div>
+
+                                        {/* Narrative Quote Container */}
+                                        <div className="rounded-lg bg-surface-container-low p-space-md flex flex-col gap-2">
+                                            <div className="flex items-center gap-1.5 text-outline">
+                                                <Icon icon="solar:chat-round-outline" className="w-4 h-4" />
+                                                <span className="font-label-sm text-label-sm uppercase tracking-wider font-bold">
+                                                    Template Kalimat Rekomendasi
+                                                </span>
+                                            </div>
+                                            <p className="font-body-md text-body-md text-on-surface italic pl-1 leading-relaxed whitespace-pre-wrap">
+                                                &ldquo;{item.narrative}&rdquo;
+                                            </p>
+                                        </div>
+
+                                        {/* Threshold Note */}
+                                        {item.description && (
+                                            <div className="flex items-center gap-1.5 text-on-surface-variant font-body-sm text-body-sm pt-1">
+                                                <Icon icon="solar:info-circle-linear" className="w-4 h-4 text-outline shrink-0" />
+                                                <span>{item.description}</span>
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             ))
@@ -342,106 +382,105 @@ export default function Index({ opinions = [], categories = [], filters = {} }) 
                     {editingOpinion && (
                         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
                             <div
-                                className="fixed inset-0 bg-black/50 backdrop-blur-xs transition-opacity"
+                                className="fixed inset-0 bg-inverse-surface/40 backdrop-blur-sm"
                                 onClick={handleCloseModal}
                             />
-                            <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-2xl p-6 z-10 space-y-4 max-h-[90vh] overflow-y-auto">
-                                <div className="flex items-start justify-between border-b pb-3">
-                                    <div>
-                                        <div className="flex items-center gap-2">
-                                            <span className={`px-2 py-0.5 rounded text-xs font-bold border font-mono ${getBadgeStyle(editingOpinion.code)}`}>
+                            <div className="relative w-full max-w-xl bg-surface-container-lowest rounded-xl shadow-xl p-space-lg flex flex-col gap-space-md z-10 max-h-[90vh] overflow-y-auto">
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-8 h-8 rounded-lg bg-primary-fixed text-primary flex items-center justify-center">
+                                            <Icon icon="solar:pen-new-square-outline" className="w-5 h-5" />
+                                        </div>
+                                        <div>
+                                            <h4 className="font-headline-md text-headline-md font-bold text-on-surface">
+                                                Edit Template Narasi
+                                            </h4>
+                                            <span className="font-data-mono text-data-mono text-outline text-xs">
                                                 {editingOpinion.code}
                                             </span>
-                                            <span className="text-xs text-gray-500 font-medium">
-                                                {editingOpinion.category}
-                                            </span>
                                         </div>
-                                        <h3 className="text-lg font-bold text-gray-900 mt-1">
-                                            Edit Template Opini & Narasi
-                                        </h3>
                                     </div>
                                     <button
                                         type="button"
                                         onClick={handleCloseModal}
-                                        className="text-gray-400 hover:text-gray-600 p-1 rounded-lg"
+                                        className="p-1 rounded-lg text-outline hover:text-on-surface hover:bg-surface-container-high transition-colors"
                                     >
                                         <Icon icon="solar:close-square-outline" className="w-5 h-5" />
                                     </button>
                                 </div>
 
-                                <form onSubmit={submitUpdate} className="space-y-4">
-                                    <div>
-                                        <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
+                                <form onSubmit={submitUpdate} className="flex flex-col gap-space-md">
+                                    <div className="flex flex-col gap-2">
+                                        <label className="font-label-sm text-label-sm uppercase tracking-wider font-bold text-outline">
                                             Judul Opini
                                         </label>
                                         <input
                                             type="text"
                                             value={data.title}
                                             onChange={(e) => setData('title', e.target.value)}
-                                            className="w-full text-sm rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                                            className="w-full px-3 py-2.5 rounded-lg bg-surface-container-low text-on-surface font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-primary border-0"
                                             required
                                         />
                                         {errors.title && (
-                                            <span className="text-xs text-red-600 mt-1 block">{errors.title}</span>
+                                            <span className="font-body-sm text-body-sm text-error">{errors.title}</span>
                                         )}
                                     </div>
 
-                                    <div>
-                                        <div className="flex items-center justify-between mb-1">
-                                            <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider">
-                                                Kalimat Narasi Rekomendasi
+                                    <div className="flex flex-col gap-2">
+                                        <div className="flex items-center justify-between">
+                                            <label className="font-label-sm text-label-sm uppercase tracking-wider font-bold text-outline">
+                                                Isi Teks Rekomendasi (Bahasa Indonesia)
                                             </label>
-                                            <span className="text-[11px] text-gray-400">
+                                            <span className="font-data-mono text-[11px] text-outline">
                                                 {data.narrative.length} karakter
                                             </span>
                                         </div>
                                         <textarea
-                                            rows="5"
+                                            rows="4"
                                             value={data.narrative}
                                             onChange={(e) => setData('narrative', e.target.value)}
-                                            className="w-full text-sm rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500 leading-relaxed"
+                                            className="w-full p-3 rounded-lg bg-surface-container-low text-on-surface font-body-md text-body-md leading-relaxed focus:outline-none focus:ring-2 focus:ring-primary resize-none border-0"
                                             placeholder="Tuliskan template narasi rekomendasi..."
                                             required
                                         />
                                         {errors.narrative && (
-                                            <span className="text-xs text-red-600 mt-1 block">{errors.narrative}</span>
+                                            <span className="font-body-sm text-body-sm text-error">{errors.narrative}</span>
                                         )}
                                     </div>
 
-                                    <div>
-                                        <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
+                                    <div className="flex flex-col gap-2">
+                                        <label className="font-label-sm text-label-sm uppercase tracking-wider font-bold text-outline">
                                             Deskripsi / Kriteria Pemicu (Catatan Internal)
                                         </label>
                                         <textarea
                                             rows="2"
                                             value={data.description}
                                             onChange={(e) => setData('description', e.target.value)}
-                                            className="w-full text-xs rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                                            className="w-full p-3 rounded-lg bg-surface-container-low text-on-surface font-body-sm text-body-sm focus:outline-none focus:ring-2 focus:ring-primary resize-none border-0"
                                             placeholder="Penjelasan kapan formula memicu opini ini (opsional)..."
                                         />
                                     </div>
 
-                                    {/* Preview Callout */}
-                                    <div className="bg-blue-50/60 border border-blue-100 rounded-xl p-3 text-xs text-blue-900">
-                                        <div className="font-semibold flex items-center gap-1 text-blue-800 mb-0.5">
-                                            <Icon icon="solar:eye-outline" className="w-4 h-4" />
-                                            Preview Narasi Live:
-                                        </div>
-                                        <p className="italic text-gray-700">"{data.narrative || 'Belum ada narasi'}"</p>
+                                    <div className="p-space-sm rounded-lg bg-surface-container flex items-start gap-2">
+                                        <Icon icon="solar:shield-check-bold-duotone" className="w-[18px] h-[18px] text-outline shrink-0 mt-0.5" />
+                                        <p className="font-body-sm text-body-sm text-on-surface-variant">
+                                            Perubahan narasi akan langsung disimpan pada tabel{' '}
+                                            <code className="font-data-mono text-primary">master_opinions</code> dan berlaku untuk laporan asesmen yang di-generate berikutnya.
+                                        </p>
                                     </div>
 
-                                    <div className="flex justify-end gap-2.5 pt-3 border-t">
+                                    <div className="flex items-center justify-end gap-2 pt-2">
                                         <button
                                             type="button"
                                             onClick={handleCloseModal}
-                                            className="px-4 py-2 border rounded-lg text-xs font-semibold text-gray-700 hover:bg-gray-50 transition"
+                                            className="px-4 py-2 rounded-lg bg-surface-container-low hover:bg-surface-container text-on-surface font-label-md text-label-md font-medium transition-colors"
                                         >
                                             Batal
                                         </button>
                                         <button
                                             type="submit"
                                             disabled={processing}
-                                            className="inline-flex items-center gap-1.5 px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold shadow-sm transition disabled:opacity-50"
+                                            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-primary hover:bg-primary-container text-on-primary font-label-md text-label-md font-semibold shadow-sm transition-colors disabled:opacity-50"
                                         >
                                             <Icon icon="solar:diskette-outline" className="w-4 h-4" />
                                             {processing ? 'Menyimpan...' : 'Simpan Perubahan'}
