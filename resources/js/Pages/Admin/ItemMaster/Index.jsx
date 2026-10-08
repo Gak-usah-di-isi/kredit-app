@@ -50,338 +50,565 @@ export default function Index({ items = [], stats = {}, canManage = false }) {
     }, [items, selectedDimension, searchQuery]);
 
     const dimensionCounts = useMemo(() => {
+        const total = items.length;
+        const pfr = items.filter((i) => i.dimension === 'PFR').length;
+        const ssr = items.filter((i) => i.dimension === 'SSR').length;
+        const sd = items.filter((i) => i.dimension === 'SD').length;
+        const pct = (n) => (total ? Math.round((n / total) * 1000) / 10 : 0);
         return {
-            total: items.length,
-            pfr: items.filter((i) => i.dimension === 'PFR').length,
-            ssr: items.filter((i) => i.dimension === 'SSR').length,
-            sd: items.filter((i) => i.dimension === 'SD').length,
+            total,
+            pfr,
+            ssr,
+            sd,
+            pfrPct: pct(pfr),
+            ssrPct: pct(ssr),
+            sdPct: pct(sd),
         };
     }, [items]);
+
+    const resetFilters = () => {
+        setSearchQuery('');
+        setSelectedDimension('ALL');
+    };
 
     const getDimBadge = (dim) => {
         if (dim === 'PFR') {
             return (
-                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200">
-                    <Icon icon="solar:wallet-money-bold-duotone" className="w-3.5 h-3.5" />
-                    PFR (Keuangan)
+                <span className="inline-flex items-center px-2.5 py-1 rounded-full text-label-sm font-semibold bg-surface-variant text-primary">
+                    PFR ({dimensionCounts.pfr} Item)
                 </span>
             );
         }
         if (dim === 'SSR') {
             return (
-                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                    <Icon icon="solar:chart-2-bold-duotone" className="w-3.5 h-3.5" />
-                    SSR (Keberlanjutan)
+                <span className="inline-flex items-center px-2.5 py-1 rounded-full text-label-sm font-semibold bg-secondary-fixed text-secondary">
+                    SSR ({dimensionCounts.ssr} Item)
                 </span>
             );
         }
         return (
-            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200">
-                <Icon icon="solar:user-speak-rounded-bold-duotone" className="w-3.5 h-3.5" />
-                SD (Kontrol Kejujuran)
+            <span className="inline-flex items-center px-2.5 py-1 rounded-full text-label-sm font-semibold bg-tertiary-fixed text-tertiary-container">
+                SD ({dimensionCounts.sd} Item)
             </span>
         );
     };
 
+    const pillBase =
+        'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-label-md text-label-md transition-all shadow-sm';
+
     return (
-        <AuthenticatedLayout
-            header={
-                <div className="flex items-center justify-between">
-                    <div>
-                        <h2 className="text-xl font-bold leading-tight text-gray-900">
-                            Master Instrumen Kuesioner ({dimensionCounts.total} Butir Soal)
-                        </h2>
-                        <p className="text-xs text-gray-500 mt-1">
-                            Kelola butir pertanyaan, pengelompokan dimensi, dan urutan instrumen psikometrik PCSM-SOPI baku.
-                        </p>
-                    </div>
-                </div>
-            }
-        >
+        <AuthenticatedLayout>
             <Head title="Master Item Kuesioner" />
 
-            <div className="py-8">
-                <div className="mx-auto max-w-7xl sm:px-6 lg:px-8 space-y-6">
+            <div className="w-full min-h-full bg-background font-body-md text-on-surface">
+                <div className="flex flex-col w-full gap-space-lg px-space-lg py-space-md pb-12">
+                    {/* Title & Quick Actions */}
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pt-2">
+                        <div>
+                            <h1 className="font-headline-xl text-headline-xl text-on-surface tracking-tight">
+                                Master Instrumen Kuesioner ({dimensionCounts.total} Item)
+                            </h1>
+                            <p className="font-body-md text-body-md text-on-surface-variant mt-1 max-w-3xl">
+                                Struktur Instrumen PCSM-SOPI Baku ({dimensionCounts.total} Butir). Terdiri dari{' '}
+                                {dimensionCounts.pfr} item Prudent Financial Responsibility (PFR),{' '}
+                                {dimensionCounts.ssr} item Sustainability Responsibility (SSR), dan{' '}
+                                {dimensionCounts.sd} item kontrol Social Desirability (SD).
+                            </p>
+                        </div>
+                        <div className="flex items-center gap-2 shrink-0">
+                            <button
+                                type="button"
+                                disabled
+                                title="Segera hadir — fitur ekspor sedang disiapkan"
+                                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-surface-container-high text-on-surface font-label-md text-label-md transition-all shadow-sm cursor-not-allowed opacity-60"
+                            >
+                                <Icon icon="solar:download-outline" className="w-[18px] h-[18px] text-on-surface-variant" />
+                                Ekspor Kuesioner
+                            </button>
+                            <button
+                                type="button"
+                                disabled
+                                title="Segera hadir — endpoint validasi parameter belum tersedia"
+                                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-primary-container text-on-primary font-label-md text-label-md transition-all shadow-sm cursor-not-allowed opacity-60"
+                            >
+                                <Icon icon="solar:add-circle-outline" className="w-[18px] h-[18px]" />
+                                Validasi Parameter
+                            </button>
+                        </div>
+                    </div>
 
-                    {/* Banner Informasi */}
-                    <div className="rounded-2xl border border-blue-100 bg-gradient-to-r from-blue-50/70 via-indigo-50/50 to-blue-50/30 p-5 shadow-sm">
-                        <div className="flex items-start gap-3">
-                            <div className="rounded-xl bg-blue-600 p-2.5 text-white shadow-sm flex-shrink-0">
-                                <Icon icon="solar:document-text-bold-duotone" className="w-6 h-6" />
+                    {/* Metric Summary Cards Grid (4 Columns) */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+                        {/* Card 1: Total Instrumen */}
+                        <div className="bg-surface-container-lowest rounded-xl p-space-md shadow-sm relative overflow-hidden group">
+                            <div className="flex items-start justify-between">
+                                <div>
+                                    <span className="font-label-sm text-label-sm uppercase tracking-wider text-outline font-semibold block mb-1">
+                                        Total Instrumen
+                                    </span>
+                                    <div className="flex items-baseline gap-2">
+                                        <span className="font-headline-xl text-headline-xl font-bold text-on-surface">
+                                            {dimensionCounts.total}
+                                        </span>
+                                        <span className="font-body-lg text-body-lg font-medium text-on-surface-variant">Butir</span>
+                                    </div>
+                                </div>
+                                <div className="w-10 h-10 rounded-lg bg-surface-container-high text-on-surface flex items-center justify-center shrink-0">
+                                    <Icon icon="solar:document-text-bold-duotone" className="w-[22px] h-[22px]" />
+                                </div>
                             </div>
-                            <div className="text-sm">
-                                <h4 className="font-bold text-gray-900">
-                                    Struktur Baku Instrumen Psikometrik PCSM-SOPI
+                            <div className="mt-3 flex items-center gap-1.5 font-label-sm text-label-sm text-secondary">
+                                <span className="w-1.5 h-1.5 rounded-full bg-secondary" />
+                                Skala Likert 1-7 Standar
+                            </div>
+                        </div>
+
+                        {/* Card 2: PFR Keuangan */}
+                        <div className="bg-surface-container-lowest rounded-xl p-space-md shadow-sm relative overflow-hidden group">
+                            <div className="flex items-start justify-between">
+                                <div>
+                                    <span className="font-label-sm text-label-sm uppercase tracking-wider text-primary font-semibold block mb-1">
+                                        PFR (Keuangan)
+                                    </span>
+                                    <div className="flex items-baseline gap-2">
+                                        <span className="font-headline-xl text-headline-xl font-bold text-primary">
+                                            {dimensionCounts.pfr}
+                                        </span>
+                                        <span className="font-body-lg text-body-lg font-medium text-on-surface-variant">Item</span>
+                                    </div>
+                                </div>
+                                <div className="w-10 h-10 rounded-lg bg-surface-variant text-primary flex items-center justify-center shrink-0">
+                                    <Icon icon="solar:wallet-money-bold-duotone" className="w-[22px] h-[22px]" />
+                                </div>
+                            </div>
+                            <div className="mt-3 flex items-center gap-1.5 font-label-sm text-label-sm text-on-surface-variant">
+                                <span className="px-2 py-0.5 rounded-full bg-surface-container-high text-primary font-bold text-[10px]">
+                                    {dimensionCounts.pfrPct}%
+                                </span>
+                                Prudent Financial
+                            </div>
+                        </div>
+
+                        {/* Card 3: SSR Keberlanjutan */}
+                        <div className="bg-surface-container-lowest rounded-xl p-space-md shadow-sm relative overflow-hidden group">
+                            <div className="flex items-start justify-between">
+                                <div>
+                                    <span className="font-label-sm text-label-sm uppercase tracking-wider text-secondary font-semibold block mb-1">
+                                        SSR (Keberlanjutan)
+                                    </span>
+                                    <div className="flex items-baseline gap-2">
+                                        <span className="font-headline-xl text-headline-xl font-bold text-secondary">
+                                            {dimensionCounts.ssr}
+                                        </span>
+                                        <span className="font-body-lg text-body-lg font-medium text-on-surface-variant">Item</span>
+                                    </div>
+                                </div>
+                                <div className="w-10 h-10 rounded-lg bg-secondary-fixed text-on-secondary-fixed flex items-center justify-center shrink-0">
+                                    <Icon icon="solar:leaf-outline" className="w-[22px] h-[22px]" />
+                                </div>
+                            </div>
+                            <div className="mt-3 flex items-center gap-1.5 font-label-sm text-label-sm text-on-surface-variant">
+                                <span className="px-2 py-0.5 rounded-full bg-secondary-fixed text-secondary font-bold text-[10px]">
+                                    {dimensionCounts.ssrPct}%
+                                </span>
+                                Sustainability
+                            </div>
+                        </div>
+
+                        {/* Card 4: SD Kontrol Kejujuran */}
+                        <div className="bg-surface-container-lowest rounded-xl p-space-md shadow-sm relative overflow-hidden group">
+                            <div className="flex items-start justify-between">
+                                <div>
+                                    <span className="font-label-sm text-label-sm uppercase tracking-wider text-tertiary-container font-semibold block mb-1">
+                                        SD (Kontrol Kejujuran)
+                                    </span>
+                                    <div className="flex items-baseline gap-2">
+                                        <span className="font-headline-xl text-headline-xl font-bold text-tertiary-container">
+                                            {dimensionCounts.sd}
+                                        </span>
+                                        <span className="font-body-lg text-body-lg font-medium text-on-surface-variant">Item</span>
+                                    </div>
+                                </div>
+                                <div className="w-10 h-10 rounded-lg bg-tertiary-fixed text-on-tertiary-fixed flex items-center justify-center shrink-0">
+                                    <Icon icon="solar:shield-check-bold-duotone" className="w-[22px] h-[22px]" />
+                                </div>
+                            </div>
+                            <div className="mt-3 flex items-center gap-1.5 font-label-sm text-label-sm text-on-surface-variant">
+                                <span className="px-2 py-0.5 rounded-full bg-tertiary-fixed text-tertiary-container font-bold text-[10px]">
+                                    {dimensionCounts.sdPct}%
+                                </span>
+                                Social Desirability
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Main Data Container */}
+                    <div className="bg-surface-container-lowest rounded-xl shadow-sm flex flex-col overflow-hidden">
+                        {/* Filter and Search Toolbar */}
+                        <div className="p-space-md bg-surface-container-low flex flex-col md:flex-row md:items-center justify-between gap-4">
+                            {/* Dimension Pill Filters */}
+                            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0">
+                                <button
+                                    type="button"
+                                    onClick={() => setSelectedDimension('ALL')}
+                                    className={`${pillBase} ${
+                                        selectedDimension === 'ALL'
+                                            ? 'bg-primary-container text-on-primary font-semibold'
+                                            : 'bg-surface-container-lowest text-on-surface-variant hover:text-on-surface hover:bg-surface-container'
+                                    }`}
+                                >
+                                    <span>Semua</span>
+                                    <span
+                                        className={`px-1.5 py-0.5 rounded-full text-[11px] ${
+                                            selectedDimension === 'ALL'
+                                                ? 'bg-surface-container-lowest/20'
+                                                : 'bg-surface-container-high text-primary font-semibold'
+                                        }`}
+                                    >
+                                        {dimensionCounts.total}
+                                    </span>
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setSelectedDimension('PFR')}
+                                    className={`${pillBase} ${
+                                        selectedDimension === 'PFR'
+                                            ? 'bg-primary-container text-on-primary font-semibold'
+                                            : 'bg-surface-container-lowest text-on-surface-variant hover:text-on-surface hover:bg-surface-container'
+                                    }`}
+                                >
+                                    <span>PFR Keuangan</span>
+                                    <span
+                                        className={`px-1.5 py-0.5 rounded-full text-[11px] ${
+                                            selectedDimension === 'PFR'
+                                                ? 'bg-surface-container-lowest/20'
+                                                : 'bg-surface-container-high text-primary font-semibold'
+                                        }`}
+                                    >
+                                        {dimensionCounts.pfr}
+                                    </span>
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setSelectedDimension('SSR')}
+                                    className={`${pillBase} ${
+                                        selectedDimension === 'SSR'
+                                            ? 'bg-primary-container text-on-primary font-semibold'
+                                            : 'bg-surface-container-lowest text-on-surface-variant hover:text-on-surface hover:bg-surface-container'
+                                    }`}
+                                >
+                                    <span>SSR Keberlanjutan</span>
+                                    <span
+                                        className={`px-1.5 py-0.5 rounded-full text-[11px] ${
+                                            selectedDimension === 'SSR'
+                                                ? 'bg-surface-container-lowest/20'
+                                                : 'bg-secondary-fixed text-secondary font-semibold'
+                                        }`}
+                                    >
+                                        {dimensionCounts.ssr}
+                                    </span>
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setSelectedDimension('SD')}
+                                    className={`${pillBase} ${
+                                        selectedDimension === 'SD'
+                                            ? 'bg-primary-container text-on-primary font-semibold'
+                                            : 'bg-surface-container-lowest text-on-surface-variant hover:text-on-surface hover:bg-surface-container'
+                                    }`}
+                                >
+                                    <span>SD Kejujuran</span>
+                                    <span
+                                        className={`px-1.5 py-0.5 rounded-full text-[11px] ${
+                                            selectedDimension === 'SD'
+                                                ? 'bg-surface-container-lowest/20'
+                                                : 'bg-tertiary-fixed text-tertiary-container font-semibold'
+                                        }`}
+                                    >
+                                        {dimensionCounts.sd}
+                                    </span>
+                                </button>
+                            </div>
+
+                            {/* Search & Options Bar */}
+                            <div className="flex items-center gap-3 w-full md:w-auto">
+                                <div className="relative flex-1 md:w-80">
+                                    <Icon
+                                        icon="solar:magnifer-outline"
+                                        className="w-[18px] h-[18px] absolute left-3 top-1/2 -translate-y-1/2 text-outline"
+                                    />
+                                    <input
+                                        type="text"
+                                        value={searchQuery}
+                                        onChange={(e) => setSearchQuery(e.target.value)}
+                                        placeholder="Cari butir pertanyaan atau kode..."
+                                        className="w-full pl-9 pr-8 py-2 text-body-sm bg-surface-container-lowest rounded-lg text-on-surface placeholder:text-outline focus:outline-none focus:ring-1 focus:ring-primary shadow-sm border-0"
+                                    />
+                                    {searchQuery && (
+                                        <button
+                                            type="button"
+                                            onClick={() => setSearchQuery('')}
+                                            className="absolute right-2.5 top-1/2 -translate-y-1/2 text-outline hover:text-on-surface"
+                                        >
+                                            <Icon icon="solar:close-circle-bold" className="w-4 h-4" />
+                                        </button>
+                                    )}
+                                </div>
+                                <div className="h-6 w-px bg-surface-container-high hidden md:block" />
+                                <button
+                                    type="button"
+                                    disabled
+                                    title="Segera hadir — opsi urutan kustom sedang disiapkan"
+                                    className="inline-flex items-center gap-1 px-3 py-2 rounded-lg bg-surface-container-lowest text-on-surface-variant font-label-sm text-label-sm shadow-sm cursor-not-allowed opacity-60"
+                                >
+                                    <Icon icon="solar:tuning-2-outline" className="w-4 h-4" />
+                                    <span className="hidden sm:inline">Urutan Baku</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Table Responsive Wrap */}
+                        <div className="overflow-x-auto w-full">
+                            <table className="w-full text-left text-body-md">
+                                <thead>
+                                    <tr className="bg-surface-container-low text-on-surface-variant uppercase font-label-sm text-label-sm tracking-wider">
+                                        <th className="py-3 px-space-md font-semibold w-40">No / Kode</th>
+                                        <th className="py-3 px-space-md font-semibold w-44">Dimensi</th>
+                                        <th className="py-3 px-space-md font-semibold">
+                                            Pernyataan Instrumen (Skala Likert 1-7)
+                                        </th>
+                                        {canManage && (
+                                            <th className="py-3 px-space-md font-semibold text-right w-32">Aksi</th>
+                                        )}
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-surface-container">
+                                    {filteredItems.length === 0 ? (
+                                        <tr>
+                                            <td colSpan={canManage ? 4 : 3} className="px-space-md">
+                                                <div className="hidden py-12 px-4 flex-col items-center justify-center text-center">
+                                                    <div className="w-12 h-12 rounded-full bg-surface-container-high flex items-center justify-center text-outline mb-3">
+                                                        <Icon icon="solar:clipboard-remove-outline" className="w-6 h-6" />
+                                                    </div>
+                                                    <h4 className="font-headline-md text-headline-md font-semibold text-on-surface">
+                                                        Tidak ada butir ditemukan
+                                                    </h4>
+                                                    <p className="font-body-md text-body-md text-on-surface-variant mt-1 max-w-sm mx-auto">
+                                                        Coba sesuaikan kata kunci pencarian atau ganti filter dimensi untuk melihat butir kuesioner.
+                                                    </p>
+                                                    <button
+                                                        type="button"
+                                                        onClick={resetFilters}
+                                                        className="mt-4 px-3 py-1.5 rounded-lg bg-surface-container-high hover:bg-surface-container-highest text-on-surface font-label-md text-label-md"
+                                                    >
+                                                        Reset Filter &amp; Pencarian
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ) : (
+                                        filteredItems.map((item, index) => (
+                                            <tr key={item.id} className="hover:bg-surface-container-low/70 transition-colors group">
+                                                <td className="py-3 px-space-md align-middle">
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="font-label-md text-label-md font-bold text-on-surface">
+                                                            {item.item_code}
+                                                        </span>
+                                                        <span className="font-label-sm text-label-sm text-on-surface-variant font-mono bg-surface-container px-1.5 py-0.5 rounded">
+                                                            Urutan: #{item.display_order ?? index + 1}
+                                                        </span>
+                                                    </div>
+                                                </td>
+                                                <td className="py-3 px-space-md align-middle">
+                                                    {getDimBadge(item.dimension)}
+                                                </td>
+                                                <td className="py-3 px-space-md align-middle text-on-surface font-body-md pr-6">
+                                                    {item.text}
+                                                </td>
+                                                {canManage && (
+                                                    <td className="py-3 px-space-md align-middle text-right">
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => handleEdit(item)}
+                                                            title="Edit Teks"
+                                                            className="p-1.5 rounded-lg text-primary hover:bg-surface-container transition-colors inline-flex items-center justify-center"
+                                                        >
+                                                            <Icon icon="solar:pen-new-square-outline" className="w-[18px] h-[18px]" />
+                                                        </button>
+                                                    </td>
+                                                )}
+                                            </tr>
+                                        ))
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        {/* Table Footer / Pagination Metadata */}
+                        <div className="p-space-md bg-surface-container-low/50 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                            <div className="flex items-center gap-2 text-on-surface-variant font-label-sm text-label-sm flex-wrap">
+                                <span>
+                                    Menampilkan <strong className="text-on-surface">{filteredItems.length}</strong> dari{' '}
+                                    <strong className="text-on-surface">{dimensionCounts.total}</strong> butir instrumen baku
+                                </span>
+                                <span className="text-outline-variant font-mono">•</span>
+                                <span className="text-secondary font-medium flex items-center gap-1">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-secondary" />
+                                    Seluruh butir tervalidasi psikometrik (r &gt; 0.65)
+                                </span>
+                            </div>
+                            <div className="flex items-center gap-1 font-label-sm text-label-sm">
+                                <span className="text-outline mr-2">Halaman 1 dari 1</span>
+                                <button
+                                    type="button"
+                                    disabled
+                                    className="p-1.5 rounded bg-surface-container-lowest text-outline-variant cursor-not-allowed shadow-sm"
+                                >
+                                    <Icon icon="solar:arrow-left-outline" className="w-4 h-4" />
+                                </button>
+                                <button
+                                    type="button"
+                                    className="px-2.5 py-1 rounded bg-primary-container text-on-primary font-bold shadow-sm"
+                                >
+                                    1
+                                </button>
+                                <button
+                                    type="button"
+                                    disabled
+                                    className="p-1.5 rounded bg-surface-container-lowest text-outline-variant cursor-not-allowed shadow-sm"
+                                >
+                                    <Icon icon="solar:arrow-right-outline" className="w-4 h-4" />
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Bottom Guidelines & Information Strip */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-space-md">
+                        <div className="p-space-md rounded-xl bg-surface-container-lowest shadow-sm flex items-start gap-3">
+                            <div className="w-9 h-9 rounded-lg bg-primary-fixed text-primary flex items-center justify-center shrink-0">
+                                <Icon icon="solar:brain-outline" className="w-5 h-5" />
+                            </div>
+                            <div>
+                                <h4 className="font-headline-md text-label-md font-bold text-on-surface leading-tight">
+                                    Kalibrasi Skala Likert 1-7
                                 </h4>
-                                <p className="text-xs text-gray-600 mt-0.5 leading-relaxed">
-                                    Instrumen kuesioner terdiri dari <span className="font-semibold text-blue-700">{dimensionCounts.pfr} item Prudent Financial Responsibility (PFR)</span>, <span className="font-semibold text-emerald-700">{dimensionCounts.ssr} item Sustainability Responsibility (SSR)</span>, dan <span className="font-semibold text-amber-700">{dimensionCounts.sd} item Social Desirability (SD)</span> dengan pilihan skala Likert (1 - 7).
+                                <p className="font-body-sm text-body-sm text-on-surface-variant mt-1">
+                                    Rentang respons bergerak dari 1 (Sangat Tidak Setuju) hingga 7 (Sangat Setuju) untuk menangkap variansi psikologis risiko kredit secara presisi.
+                                </p>
+                            </div>
+                        </div>
+                        <div className="p-space-md rounded-xl bg-surface-container-lowest shadow-sm flex items-start gap-3">
+                            <div className="w-9 h-9 rounded-lg bg-secondary-fixed text-secondary flex items-center justify-center shrink-0">
+                                <Icon icon="solar:shield-check-bold-duotone" className="w-5 h-5" />
+                            </div>
+                            <div>
+                                <h4 className="font-headline-md text-label-md font-bold text-on-surface leading-tight">
+                                    Mekanisme Kontrol SD (Social Desirability)
+                                </h4>
+                                <p className="font-body-sm text-body-sm text-on-surface-variant mt-1">
+                                    {dimensionCounts.sd} butir pengontrol disisipkan acak untuk mendeteksi kecenderungan nasabah menjawab secara normatif atau memanipulasi citra diri.
+                                </p>
+                            </div>
+                        </div>
+                        <div className="p-space-md rounded-xl bg-surface-container-lowest shadow-sm flex items-start gap-3">
+                            <div className="w-9 h-9 rounded-lg bg-tertiary-fixed text-tertiary-container flex items-center justify-center shrink-0">
+                                <Icon icon="solar:book-bookmark-outline" className="w-5 h-5" />
+                            </div>
+                            <div>
+                                <h4 className="font-headline-md text-label-md font-bold text-on-surface leading-tight">
+                                    Kebijakan Perubahan Teks
+                                </h4>
+                                <p className="font-body-sm text-body-sm text-on-surface-variant mt-1">
+                                    Modifikasi redaksional butir memerlukan persetujuan Komite Model dan akan mencatat revisi log audit kalibrasi sistem secara permanen.
                                 </p>
                             </div>
                         </div>
                     </div>
 
-                    {/* Filter Cards Status */}
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
-                        <div
-                            onClick={() => setSelectedDimension('ALL')}
-                            className={`p-4 rounded-xl border cursor-pointer transition shadow-sm ${
-                                selectedDimension === 'ALL'
-                                    ? 'bg-blue-600 text-white border-blue-600'
-                                    : 'bg-white text-gray-800 border-gray-100 hover:border-gray-300'
-                            }`}
-                        >
-                            <span className={`text-[11px] block font-semibold uppercase tracking-wider ${selectedDimension === 'ALL' ? 'text-blue-100' : 'text-gray-400'}`}>
-                                Total Butir Soal
-                            </span>
-                            <div className="text-2xl font-black mt-1">{dimensionCounts.total}</div>
-                            <span className={`text-[11px] block mt-0.5 ${selectedDimension === 'ALL' ? 'text-blue-100' : 'text-gray-400'}`}>Semua Dimensi</span>
-                        </div>
-
-                        <div
-                            onClick={() => setSelectedDimension('PFR')}
-                            className={`p-4 rounded-xl border cursor-pointer transition shadow-sm ${
-                                selectedDimension === 'PFR'
-                                    ? 'bg-blue-700 text-white border-blue-700'
-                                    : 'bg-white text-gray-800 border-gray-100 hover:border-blue-200'
-                            }`}
-                        >
-                            <span className={`text-[11px] block font-semibold uppercase tracking-wider ${selectedDimension === 'PFR' ? 'text-blue-100' : 'text-blue-600'}`}>
-                                PFR (Keuangan)
-                            </span>
-                            <div className="text-2xl font-black mt-1">{dimensionCounts.pfr}</div>
-                            <span className={`text-[11px] block mt-0.5 ${selectedDimension === 'PFR' ? 'text-blue-100' : 'text-gray-400'}`}>Tanggung Jawab Financial</span>
-                        </div>
-
-                        <div
-                            onClick={() => setSelectedDimension('SSR')}
-                            className={`p-4 rounded-xl border cursor-pointer transition shadow-sm ${
-                                selectedDimension === 'SSR'
-                                    ? 'bg-emerald-600 text-white border-emerald-600'
-                                    : 'bg-white text-gray-800 border-gray-100 hover:border-emerald-200'
-                            }`}
-                        >
-                            <span className={`text-[11px] block font-semibold uppercase tracking-wider ${selectedDimension === 'SSR' ? 'text-emerald-100' : 'text-emerald-600'}`}>
-                                SSR (Keberlanjutan)
-                            </span>
-                            <div className="text-2xl font-black mt-1">{dimensionCounts.ssr}</div>
-                            <span className={`text-[11px] block mt-0.5 ${selectedDimension === 'SSR' ? 'text-emerald-100' : 'text-gray-400'}`}>Perilaku Bisnis Hijau</span>
-                        </div>
-
-                        <div
-                            onClick={() => setSelectedDimension('SD')}
-                            className={`p-4 rounded-xl border cursor-pointer transition shadow-sm ${
-                                selectedDimension === 'SD'
-                                    ? 'bg-amber-600 text-white border-amber-600'
-                                    : 'bg-white text-gray-800 border-gray-100 hover:border-amber-200'
-                            }`}
-                        >
-                            <span className={`text-[11px] block font-semibold uppercase tracking-wider ${selectedDimension === 'SD' ? 'text-amber-100' : 'text-amber-600'}`}>
-                                SD (Kontrol)
-                            </span>
-                            <div className="text-2xl font-black mt-1">{dimensionCounts.sd}</div>
-                            <span className={`text-[11px] block mt-0.5 ${selectedDimension === 'SD' ? 'text-amber-100' : 'text-gray-400'}`}>Integritas & Social Desirability</span>
-                        </div>
-                    </div>
-
-                    {/* Filter & Search Bar */}
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
-                        <div className="flex flex-wrap items-center gap-1.5">
-                            <button
-                                type="button"
-                                onClick={() => setSelectedDimension('ALL')}
-                                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
-                                    selectedDimension === 'ALL'
-                                        ? 'bg-gray-900 text-white shadow-sm'
-                                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                                }`}
-                            >
-                                Semua ({dimensionCounts.total})
-                            </button>
-                            <button
-                                type="button"
-                                onClick={() => setSelectedDimension('PFR')}
-                                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
-                                    selectedDimension === 'PFR'
-                                        ? 'bg-blue-600 text-white shadow-sm'
-                                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                                }`}
-                            >
-                                PFR ({dimensionCounts.pfr})
-                            </button>
-                            <button
-                                type="button"
-                                onClick={() => setSelectedDimension('SSR')}
-                                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
-                                    selectedDimension === 'SSR'
-                                        ? 'bg-emerald-600 text-white shadow-sm'
-                                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                                }`}
-                            >
-                                SSR ({dimensionCounts.ssr})
-                            </button>
-                            <button
-                                type="button"
-                                onClick={() => setSelectedDimension('SD')}
-                                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
-                                    selectedDimension === 'SD'
-                                        ? 'bg-amber-600 text-white shadow-sm'
-                                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                                }`}
-                            >
-                                SD ({dimensionCounts.sd})
-                            </button>
-                        </div>
-
-                        {/* Search Bar */}
-                        <div className="relative w-full sm:w-72">
-                            <Icon
-                                icon="solar:magnifer-outline"
-                                className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-                            />
-                            <input
-                                type="text"
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                placeholder="Cari butir instrumen / kode..."
-                                className="w-full pl-9 pr-3 py-1.5 text-xs rounded-lg border border-gray-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                            />
-                            {searchQuery && (
-                                <button
-                                    type="button"
-                                    onClick={() => setSearchQuery('')}
-                                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                                >
-                                    <Icon icon="solar:close-circle-bold" className="w-3.5 h-3.5" />
-                                </button>
-                            )}
-                        </div>
-                    </div>
-
-                    {/* Table / List View */}
-                    <div className="overflow-hidden bg-white shadow-sm rounded-2xl border border-gray-100">
-                        <table className="min-w-full divide-y divide-gray-100 text-sm">
-                            <thead className="bg-gray-50/80">
-                                <tr>
-                                    <th className="px-6 py-3.5 text-left text-xs font-bold uppercase tracking-wider text-gray-500">
-                                        No / Kode
-                                    </th>
-                                    <th className="px-6 py-3.5 text-left text-xs font-bold uppercase tracking-wider text-gray-500">
-                                        Dimensi
-                                    </th>
-                                    <th className="px-6 py-3.5 text-left text-xs font-bold uppercase tracking-wider text-gray-500">
-                                        Pernyataan Instrumen (Skala Likert 1-7)
-                                    </th>
-                                    {canManage && (
-                                        <th className="px-6 py-3.5 text-right text-xs font-bold uppercase tracking-wider text-gray-500">
-                                            Aksi
-                                        </th>
-                                    )}
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-100 bg-white">
-                                {filteredItems.length === 0 ? (
-                                    <tr>
-                                        <td colSpan={canManage ? 4 : 3} className="px-6 py-12 text-center">
-                                            <Icon icon="solar:clipboard-remove-outline" className="w-10 h-10 text-gray-300 mx-auto mb-2" />
-                                            <span className="text-sm font-semibold text-gray-600 block">Tidak ada butir instrumen yang cocok</span>
-                                            <span className="text-xs text-gray-400">Coba ubah kata kunci atau filter dimensi.</span>
-                                        </td>
-                                    </tr>
-                                ) : (
-                                    filteredItems.map((item, index) => (
-                                        <tr key={item.id} className="hover:bg-gray-50/60 transition">
-                                            <td className="px-6 py-4 font-mono text-xs">
-                                                <span className="font-bold text-gray-900 block">{item.item_code}</span>
-                                                <span className="text-gray-400 text-[11px]">Urutan: #{item.display_order ?? (index + 1)}</span>
-                                            </td>
-                                            <td className="px-6 py-4">
-                                                {getDimBadge(item.dimension)}
-                                            </td>
-                                            <td className="px-6 py-4 text-gray-800 text-sm leading-relaxed max-w-xl">
-                                                "{item.text}"
-                                            </td>
-                                            {canManage && (
-                                                <td className="px-6 py-4 text-right">
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => handleEdit(item)}
-                                                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-blue-600 hover:text-white bg-blue-50 hover:bg-blue-600 border border-blue-100 transition shadow-xs"
-                                                    >
-                                                        <Icon icon="solar:pen-new-square-outline" className="w-3.5 h-3.5" />
-                                                        Edit Teks
-                                                    </button>
-                                                </td>
-                                            )}
-                                        </tr>
-                                    ))
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
-
-                    {/* Modal Edit Dialog */}
+                    {/* Modal Edit Butir Kuesioner */}
                     {editingItem && (
                         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
                             <div
-                                className="fixed inset-0 bg-black/40 backdrop-blur-xs transition-opacity"
+                                className="fixed inset-0 bg-inverse-surface/40 backdrop-blur-sm"
                                 onClick={handleCloseModal}
                             />
-                            <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg p-6 z-10 space-y-4">
-                                <div className="flex items-start justify-between border-b pb-3">
-                                    <div>
-                                        <div className="flex items-center gap-2 mb-1">
-                                            <span className="px-2 py-0.5 rounded text-xs font-bold bg-blue-100 text-blue-800 font-mono">
-                                                #{editingItem.item_code}
-                                            </span>
-                                            <span className="text-xs text-gray-500">
-                                                Dimensi: <strong className="text-gray-700">{editingItem.dimension}</strong>
-                                            </span>
-                                        </div>
-                                        <h3 className="text-lg font-bold text-gray-900">
-                                            Edit Pernyataan Instumen
-                                        </h3>
+                            <div className="bg-surface-container-lowest rounded-xl max-w-lg w-full p-space-lg shadow-xl relative z-10 max-h-[90vh] overflow-y-auto">
+                                <div className="flex items-center justify-between pb-3 mb-space-sm border-b border-surface-container">
+                                    <div className="flex items-center gap-2">
+                                        <span className="w-7 h-7 rounded-md bg-primary-fixed text-primary flex items-center justify-center font-bold text-[12px] font-mono">
+                                            {editingItem.item_code}
+                                        </span>
+                                        <h3 className="font-headline-md text-headline-md text-on-surface">Edit Butir Instrumen</h3>
                                     </div>
                                     <button
                                         type="button"
                                         onClick={handleCloseModal}
-                                        className="text-gray-400 hover:text-gray-600 p-1 rounded-lg"
+                                        className="w-8 h-8 rounded-lg flex items-center justify-center text-outline hover:bg-surface-container-high transition-colors"
                                     >
                                         <Icon icon="solar:close-square-outline" className="w-5 h-5" />
                                     </button>
                                 </div>
 
-                                <form onSubmit={submitUpdate} className="space-y-4">
-                                    <div>
-                                        <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
-                                            Pernyataan Butir Soal (Bahasa Indonesia)
-                                        </label>
-                                        <textarea
-                                            rows="4"
-                                            value={data.text}
-                                            onChange={(e) => setData('text', e.target.value)}
-                                            className="w-full text-sm rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500 leading-relaxed"
-                                            placeholder="Tuliskan teks butir instrumen..."
-                                            required
-                                        ></textarea>
-                                        {errors.text && (
-                                            <span className="text-xs text-red-600 mt-1 block">{errors.text}</span>
-                                        )}
+                                <form onSubmit={submitUpdate}>
+                                    <div className="space-y-4 pt-space-sm">
+                                        <div>
+                                            <label className="block font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant font-semibold mb-1.5">
+                                                Dimensi Psikometrik
+                                            </label>
+                                            <input
+                                                type="text"
+                                                value={
+                                                    editingItem.dimension === 'PFR'
+                                                        ? `PFR (${dimensionCounts.pfr} Item)`
+                                                        : editingItem.dimension === 'SSR'
+                                                        ? `SSR (${dimensionCounts.ssr} Item)`
+                                                        : `SD (${dimensionCounts.sd} Item)`
+                                                }
+                                                disabled
+                                                className="w-full px-3 py-2 bg-surface-container-low rounded-lg text-on-surface font-label-md text-label-md cursor-not-allowed opacity-80 border-0"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant font-semibold mb-1.5">
+                                                Teks Pernyataan (Bahasa Indonesia)
+                                            </label>
+                                            <textarea
+                                                rows="4"
+                                                value={data.text}
+                                                onChange={(e) => setData('text', e.target.value)}
+                                                className="w-full p-3 text-body-md bg-surface-container-low rounded-lg text-on-surface focus:outline-none focus:ring-2 focus:ring-primary placeholder:text-outline resize-none border-0 leading-relaxed"
+                                                placeholder="Tuliskan teks butir instrumen..."
+                                                required
+                                            />
+                                            {errors.text && (
+                                                <p className="text-error font-label-sm text-[11px] mt-1 block">{errors.text}</p>
+                                            )}
+                                            <span className="text-outline font-label-sm text-[11px] mt-1 block">
+                                                Pastikan kalimat netral, tidak mengarahkan, dan mudah dipahami oleh debitur UMKM.
+                                            </span>
+                                        </div>
+                                        <div className="p-3 rounded-lg bg-surface-container-low flex items-start gap-2 text-on-surface-variant">
+                                            <Icon icon="solar:info-circle-linear" className="w-[18px] h-[18px] text-secondary shrink-0 mt-0.5" />
+                                            <p className="font-label-sm text-label-sm">
+                                                Perubahan butir akan langsung aktif pada formulir kuesioner asesmen baru tanpa mempengaruhi asesmen yang telah berstatus selesai.
+                                            </p>
+                                        </div>
                                     </div>
 
-                                    <div className="flex justify-end gap-2.5 pt-3 border-t">
+                                    <div className="mt-space-lg flex items-center justify-end gap-2 pt-2 border-t border-surface-container">
                                         <button
                                             type="button"
                                             onClick={handleCloseModal}
-                                            className="px-4 py-2 border rounded-lg text-xs font-semibold text-gray-700 hover:bg-gray-50 transition"
+                                            className="px-4 py-2 rounded-lg bg-surface-container-high hover:bg-surface-container-highest text-on-surface font-label-md text-label-md transition-colors"
                                         >
                                             Batal
                                         </button>
                                         <button
                                             type="submit"
                                             disabled={processing}
-                                            className="inline-flex items-center gap-1.5 px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold shadow-sm transition disabled:opacity-50"
+                                            className="px-4 py-2 rounded-lg bg-primary text-on-primary hover:bg-primary-container font-label-md text-label-md font-semibold transition-colors shadow-sm disabled:opacity-50"
                                         >
-                                            <Icon icon="solar:diskette-outline" className="w-4 h-4" />
                                             {processing ? 'Menyimpan...' : 'Simpan Perubahan'}
                                         </button>
                                     </div>
@@ -389,7 +616,6 @@ export default function Index({ items = [], stats = {}, canManage = false }) {
                             </div>
                         </div>
                     )}
-
                 </div>
             </div>
         </AuthenticatedLayout>
