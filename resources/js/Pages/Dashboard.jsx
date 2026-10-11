@@ -1,9 +1,23 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, usePage } from '@inertiajs/react';
-import {FileText, Clock3, CircleCheck, AlertTriangle, CircleAlert, Eye, SlidersHorizontal, Contact, Download} from 'lucide-react';
+import { useState, useMemo } from 'react';
+import { FileText, Clock3, CircleCheck, AlertTriangle, CircleAlert, Eye, Contact, Download } from 'lucide-react';
 
 export default function Dashboard({ stats, recentAssessments = [] }) {
     const { auth, authRoles = [] } = usePage().props;
+    const [activeTab, setActiveTab] = useState('all');
+
+    const filteredAssessments = useMemo(() => {
+        if (activeTab === 'pending') {
+            return recentAssessments.filter((item) => item.status === 'submitted');
+        }
+        if (activeTab === 'completed') {
+            return recentAssessments.filter(
+                (item) => item.status === 'reviewed' || item.status === 'decided'
+            );
+        }
+        return recentAssessments;
+    }, [recentAssessments, activeTab]);
 
     const getRoleName = (roles) => {
         if (roles.includes('admin_sistem')) return 'Admin Sistem';
@@ -143,218 +157,202 @@ export default function Dashboard({ stats, recentAssessments = [] }) {
                             </p>
                         </div>
 
-                        <div className="flex items-center bg-indigo-50 rounded-xl p-1">
+                        <div className="flex items-center bg-indigo-50 rounded-xl p-1 gap-1">
                             <button
                                 type="button"
-                                className="px-4 py-2 rounded-lg bg-blue-700 text-white text-xs font-semibold"
+                                onClick={() => setActiveTab('all')}
+                                className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all duration-150 ${
+                                    activeTab === 'all'
+                                        ? 'bg-blue-700 text-white shadow-sm'
+                                        : 'text-gray-700 hover:text-gray-900 hover:bg-white/60'
+                                }`}
                             >
                                 Semua
                             </button>
 
                             <button
                                 type="button"
-                                className="px-4 py-2 rounded-lg text-gray-700 text-xs font-medium"
+                                onClick={() => setActiveTab('pending')}
+                                className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all duration-150 ${
+                                    activeTab === 'pending'
+                                        ? 'bg-blue-700 text-white shadow-sm'
+                                        : 'text-gray-700 hover:text-gray-900 hover:bg-white/60'
+                                }`}
                             >
                                 Perlu Verifikasi
                             </button>
 
                             <button
                                 type="button"
-                                className="px-4 py-2 rounded-lg text-gray-700 text-xs font-medium"
+                                onClick={() => setActiveTab('completed')}
+                                className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all duration-150 ${
+                                    activeTab === 'completed'
+                                        ? 'bg-blue-700 text-white shadow-sm'
+                                        : 'text-gray-700 hover:text-gray-900 hover:bg-white/60'
+                                }`}
                             >
                                 Selesai
                             </button>
                         </div>
                     </div>
 
-                    {/* Filter */}
-                    <div className="mb-4">
-                        <div className="flex items-center gap-3 bg-indigo-50 rounded-xl px-4 py-3">
-                            <SlidersHorizontal
-                                size={18}
-                                className="text-gray-600 shrink-0"
-                                strokeWidth={2}
-                            />
+                    {/* Table */}
+                    <div className="overflow-x-auto">
+                        <table className="min-w-full text-sm">
+                            <thead>
+                                <tr className="bg-indigo-50">
+                                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                                        No & Debitur
+                                    </th>
 
-                            <input
-                                type="text"
-                                placeholder="Saring nama debitur, NIK, atau status..."
-                                className="w-full bg-transparent border-0 p-0 text-sm text-gray-700 placeholder:text-gray-500 focus:ring-0 focus:outline-none"
-                            />
-                        </div>
-                    </div>
-                    {recentAssessments.length === 0 ? (
-                        <div className="overflow-x-auto">
-                            <table className="min-w-full text-sm">
-                                <thead>
-                                    <tr className="bg-indigo-50">
-                                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">No & Debitur</th>
-                                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Petugas</th>
-                                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Status</th>
-                                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Rekomendasi</th>
-                                        <th className="px-4 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wide">Aksi</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
+                                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                                        Petugas
+                                    </th>
+
+                                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                                        Status
+                                    </th>
+
+                                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                                        Rekomendasi
+                                    </th>
+
+                                    <th className="px-4 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                                        Aksi
+                                    </th>
+                                </tr>
+                            </thead>
+
+                            <tbody className="divide-y divide-gray-100">
+                                {filteredAssessments.length === 0 ? (
                                     <tr>
-                                        <td colSpan="5" className="text-center py-16 text-sm text-gray-400">
-                                            Belum ada aktivitas asesmen untuk ditampilkan.
+                                        <td colSpan="5" className="text-center py-14 text-sm text-gray-400">
+                                            {recentAssessments.length === 0
+                                                ? 'Belum ada aktivitas asesmen untuk ditampilkan.'
+                                                : 'Tidak ada aktivitas asesmen dengan filter yang dipilih.'}
                                         </td>
                                     </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    ) : (
-                        <>
-                            {/* Table */}
-                            <div className="overflow-x-auto">
-                                <table className="min-w-full text-sm">
-                                    <thead>
-                                        <tr className="bg-indigo-50">
-                                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                                                No & Debitur
-                                            </th>
+                                ) : (
+                                    filteredAssessments.slice(0, 5).map((item) => {
+                                        const borrowerName = item.borrower?.name ?? 'Tanpa Nama';
 
-                                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                                                Petugas
-                                            </th>
+                                        const initials = borrowerName
+                                            .split(' ')
+                                            .map((name) => name[0])
+                                            .join('')
+                                            .slice(0, 2)
+                                            .toUpperCase();
 
-                                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                                                Status
-                                            </th>
+                                        const status =
+                                            item.status === 'submitted'
+                                                ? 'Submitted'
+                                                : item.status === 'reviewed'
+                                                    ? 'Reviewed'
+                                                    : item.status === 'decided'
+                                                        ? 'Decided'
+                                                        : item.status === 'draft'
+                                                            ? 'Draft'
+                                                            : item.status;
 
-                                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                                                Rekomendasi
-                                            </th>
+                                        return (
+                                            <tr
+                                                key={item.id}
+                                                className="hover:bg-gray-50 transition"
+                                            >
+                                                {/* Debitur */}
+                                                <td className="px-4 py-4">
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="w-10 h-10 rounded-full bg-blue-700 text-white flex items-center justify-center font-bold text-xs shrink-0">
+                                                            {initials}
+                                                        </div>
 
-                                            <th className="px-4 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                                                Aksi
-                                            </th>
-                                        </tr>
-                                    </thead>
-
-                                    <tbody className="divide-y divide-gray-100">
-                                        {recentAssessments.slice(0, 5).map((item) => {
-                                            const borrowerName = item.borrower?.name ?? 'Tanpa Nama';
-
-                                            const initials = borrowerName
-                                                .split(' ')
-                                                .map((name) => name[0])
-                                                .join('')
-                                                .slice(0, 2)
-                                                .toUpperCase();
-
-                                            const status =
-                                                item.status === 'submitted'
-                                                    ? 'Submitted'
-                                                    : item.status === 'reviewed'
-                                                        ? 'Reviewed'
-                                                        : item.status === 'decided'
-                                                            ? 'Decided'
-                                                            : item.status === 'draft'
-                                                                ? 'Draft'
-                                                                : item.status;
-
-                                            return (
-                                                <tr
-                                                    key={item.id}
-                                                    className="hover:bg-gray-50 transition"
-                                                >
-                                                    {/* Debitur */}
-                                                    <td className="px-4 py-4">
-                                                        <div className="flex items-center gap-3">
-                                                            <div className="w-10 h-10 rounded-full bg-blue-700 text-white flex items-center justify-center font-bold text-xs shrink-0">
-                                                                {initials}
+                                                        <div>
+                                                            <div className="font-semibold text-gray-900">
+                                                                {borrowerName}
                                                             </div>
 
-                                                            <div>
-                                                                <div className="font-semibold text-gray-900">
-                                                                    {borrowerName}
-                                                                </div>
-
-                                                                <div className="text-xs text-gray-500 mt-0.5">
-                                                                    NIK: {item.borrower?.nik ?? '-'}
-                                                                </div>
+                                                            <div className="text-xs text-gray-500 mt-0.5">
+                                                                NIK: {item.borrower?.nik ?? '-'}
                                                             </div>
                                                         </div>
-                                                    </td>
+                                                    </div>
+                                                </td>
 
-                                                    {/* Petugas */}
-                                                    <td className="px-4 py-4 text-sm text-gray-700">
-                                                        {item.officer?.name || 'Petugas Kredit'}
-                                                    </td>
+                                                {/* Petugas */}
+                                                <td className="px-4 py-4 text-sm text-gray-700">
+                                                    {item.officer?.name || 'Petugas Kredit'}
+                                                </td>
 
-                                                    {/* Status */}
-                                                    <td className="px-4 py-4">
+                                                {/* Status */}
+                                                <td className="px-4 py-4">
+                                                    <span
+                                                        className={`inline-flex px-3 py-1 rounded-full text-[11px] font-semibold ${
+                                                            item.status === 'submitted'
+                                                                ? 'bg-indigo-100 text-indigo-800'
+                                                                : item.status === 'reviewed'
+                                                                    ? 'bg-emerald-100 text-emerald-800'
+                                                                    : item.status === 'decided'
+                                                                        ? 'bg-blue-100 text-blue-800'
+                                                                        : 'bg-gray-100 text-gray-700'
+                                                        }`}
+                                                    >
+                                                        {status}
+                                                    </span>
+                                                </td>
+
+                                                {/* Rekomendasi */}
+                                                <td className="px-4 py-4">
+                                                    {item.decision?.final_recommendation ? (
                                                         <span
                                                             className={`inline-flex px-3 py-1 rounded-full text-[11px] font-semibold ${
-                                                                item.status === 'submitted'
-                                                                    ? 'bg-indigo-100 text-indigo-800'
-                                                                    : item.status === 'reviewed'
-                                                                        ? 'bg-emerald-100 text-emerald-800'
-                                                                        : item.status === 'decided'
-                                                                            ? 'bg-blue-100 text-blue-800'
-                                                                            : 'bg-gray-100 text-gray-700'
+                                                                item.decision.final_recommendation === 'SUPPORTIVE'
+                                                                    ? 'bg-emerald-100 text-emerald-800'
+                                                                    : item.decision.final_recommendation.includes('REVIEW')
+                                                                        ? 'bg-indigo-100 text-indigo-800'
+                                                                        : 'bg-rose-100 text-rose-800'
                                                             }`}
                                                         >
-                                                            {status}
+                                                            {item.decision.final_recommendation}
                                                         </span>
-                                                    </td>
+                                                    ) : (
+                                                        <span className="inline-flex px-3 py-1 rounded-full bg-gray-100 text-gray-600 text-[11px] font-semibold">
+                                                            Draft
+                                                        </span>
+                                                    )}
+                                                </td>
 
-                                                    {/* Rekomendasi */}
-                                                    <td className="px-4 py-4">
-                                                        {item.decision?.final_recommendation ? (
-                                                            <span
-                                                                className={`inline-flex px-3 py-1 rounded-full text-[11px] font-semibold ${
-                                                                    item.decision.final_recommendation === 'SUPPORTIVE'
-                                                                        ? 'bg-emerald-100 text-emerald-800'
-                                                                        : item.decision.final_recommendation.includes('REVIEW')
-                                                                            ? 'bg-indigo-100 text-indigo-800'
-                                                                            : 'bg-rose-100 text-rose-800'
-                                                                }`}
-                                                            >
-                                                                {item.decision.final_recommendation}
-                                                            </span>
-                                                        ) : (
-                                                            <span className="inline-flex px-3 py-1 rounded-full bg-gray-100 text-gray-600 text-[11px] font-semibold">
-                                                                Draft
-                                                            </span>
-                                                        )}
-                                                    </td>
+                                                {/* Aksi */}
+                                                <td className="px-4 py-4 text-center">
+                                                    <Link
+                                                        href={route('assessments.show', item.id)}
+                                                        className="inline-flex items-center justify-center text-blue-800 hover:text-blue-600"
+                                                        title="Lihat detail"
+                                                    >
+                                                        <Eye size={19} strokeWidth={2} />
+                                                    </Link>
+                                                </td>
+                                            </tr>
+                                        );
+                                    })
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
 
-                                                    {/* Aksi */}
-                                                    <td className="px-4 py-4 text-center">
-                                                        <Link
-                                                            href={route('assessments.show', item.id)}
-                                                            className="inline-flex items-center justify-center text-blue-800 hover:text-blue-600"
-                                                            title="Lihat detail"
-                                                        >
-                                                            <Eye size={19} strokeWidth={2} />
-                                                        </Link>
-                                                    </td>
-                                                </tr>
-                                            );
-                                        })}
-                                    </tbody>
-                                </table>
-                            </div>
+                    {/* Footer */}
+                    <div className="flex items-center justify-between bg-indigo-50 rounded-xl px-4 py-3 mt-4">
+                        <span className="text-xs text-gray-600">
+                            Menampilkan {Math.min(filteredAssessments.length, 5)} dari {filteredAssessments.length} data rekaman asesmen
+                        </span>
 
-                            {/* Footer */}
-                            <div className="flex items-center justify-between bg-indigo-50 rounded-xl px-4 py-3 mt-4">
-                                <span className="text-xs text-gray-600">
-                                    Menampilkan {Math.min(recentAssessments.length, 5)} dari {recentAssessments.length} data rekaman asesmen
-                                </span>
-
-                                <Link
-                                    href={route('assessments.index')}
-                                    className="text-sm font-semibold text-blue-800 hover:text-blue-600 inline-flex items-center gap-1"
-                                >
-                                    Lihat Semua Asesmen
-                                    <span className="text-lg">›</span>
-                                </Link>
-                            </div>
-                        </>
-                    )}
+                        <Link
+                            href={route('assessments.index')}
+                            className="text-sm font-semibold text-blue-800 hover:text-blue-600 inline-flex items-center gap-1"
+                        >
+                            Lihat Semua Asesmen
+                            <span className="text-lg">›</span>
+                        </Link>
+                    </div>
                 </div>
                  
                {/* Risk Distribution */}

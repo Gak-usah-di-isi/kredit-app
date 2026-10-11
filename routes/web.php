@@ -56,7 +56,7 @@ Route::get('/dashboard', function () {
         $stats['pending_review'] = \App\Models\Assessment::where('status', 'submitted')->count();
     }
 
-    $recentQuery = \App\Models\Assessment::with(['borrower', 'decision', 'officer'])->latest()->take(5);
+    $recentQuery = \App\Models\Assessment::with(['borrower', 'decision', 'officer'])->latest()->take(10);
     if ($isOfficerOnly) {
         $recentQuery->where('officer_id', $user->id);
     }
