@@ -29,35 +29,25 @@ export default function Edit({ mustVerifyEmail, status }) {
         : '-';
 
     return (
-        <AuthenticatedLayout
-            header={
-                <div>
-                    <h2 className="text-xl font-semibold leading-tight text-gray-800">
-                        Profil Pengguna & Keamanan Akun
-                    </h2>
-                    <p className="text-sm text-gray-500 mt-0.5">
-                        Kelola informasi pribadi, identitas staf perbankan, dan keamanan akun Anda.
-                    </p>
-                </div>
-            }
-        >
+        <AuthenticatedLayout>
             <Head title="Profil" />
 
             <div className="py-8">
                 <div className="mx-auto max-w-7xl space-y-6 sm:px-6 lg:px-8">
 
                     {/* Kartu Identitas Staf BPR */}
-                    <div className="bg-white shadow sm:rounded-lg overflow-hidden">
-                        <div className="h-24 bg-gradient-to-r from-blue-600 to-blue-800" />
-                        <div className="px-6 pb-6 -mt-12">
-                            <div className="flex flex-col sm:flex-row sm:items-end gap-4">
-                                <div className="w-20 h-20 rounded-xl bg-blue-600 border-4 border-white shadow-lg flex items-center justify-center flex-shrink-0">
-                                    <span className="text-2xl font-bold text-white">{userInitial}</span>
+                    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 sm:p-8">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 pb-6 border-b border-gray-100">
+                            <div className="flex flex-col sm:flex-row sm:items-center gap-5">
+                                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-700 via-blue-600 to-indigo-700 text-white font-bold text-3xl flex items-center justify-center shrink-0 shadow-md shadow-blue-600/20">
+                                    {userInitial}
                                 </div>
-                                <div className="flex-1 pt-2 sm:pt-0">
-                                    <h3 className="text-xl font-bold text-gray-900">{userName}</h3>
-                                    <p className="text-sm text-gray-500">{userEmail}</p>
-                                    <div className="flex flex-wrap items-center gap-2 mt-2">
+
+                                <div>
+                                    <div className="flex flex-wrap items-center gap-3">
+                                        <h2 className="text-2xl font-bold text-gray-900 tracking-tight">
+                                            {userName}
+                                        </h2>
                                         <span className="inline-flex items-center gap-1.5 rounded-full bg-blue-50 border border-blue-200 px-3 py-1 text-xs font-semibold text-blue-700">
                                             <Icon icon="solar:shield-check-bold-duotone" width={14} />
                                             {roleBadge}
@@ -67,36 +57,44 @@ export default function Edit({ mustVerifyEmail, status }) {
                                             Aktif
                                         </span>
                                     </div>
+
+                                    <div className="flex items-center gap-2 mt-2 text-sm text-gray-500">
+                                        <Icon icon="solar:letter-line-duotone" width={18} className="text-gray-400 shrink-0" />
+                                        <span>{userEmail}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Grid 3 Kolom Info Staf */}
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-6">
+                            <div className="flex items-center gap-3.5 bg-gray-50/80 rounded-xl p-4 border border-gray-100">
+                                <div className="w-11 h-11 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center shrink-0">
+                                    <Icon icon="solar:buildings-3-line-duotone" width={22} />
+                                </div>
+                                <div>
+                                    <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Kantor Cabang</p>
+                                    <p className="text-sm font-bold text-gray-900 mt-0.5">{user?.cabang || 'BPR Kantor Operasional'}</p>
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6 pt-5 border-t border-gray-100">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-9 h-9 rounded-lg bg-gray-100 flex items-center justify-center">
-                                        <Icon icon="solar:buildings-3-line-duotone" className="text-gray-500" width={18} />
-                                    </div>
-                                    <div>
-                                        <p className="text-[11px] font-medium text-gray-400 uppercase tracking-wide">Kantor Cabang</p>
-                                        <p className="text-sm font-semibold text-gray-800">{user?.cabang || 'BPR Kantor Operasional'}</p>
-                                    </div>
+                            <div className="flex items-center gap-3.5 bg-gray-50/80 rounded-xl p-4 border border-gray-100">
+                                <div className="w-11 h-11 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center shrink-0">
+                                    <Icon icon="solar:card-2-line-duotone" width={22} />
                                 </div>
-                                <div className="flex items-center gap-3">
-                                    <div className="w-9 h-9 rounded-lg bg-gray-100 flex items-center justify-center">
-                                        <Icon icon="solar:card-2-line-duotone" className="text-gray-500" width={18} />
-                                    </div>
-                                    <div>
-                                        <p className="text-[11px] font-medium text-gray-400 uppercase tracking-wide">NIP Pegawai</p>
-                                        <p className="text-sm font-semibold text-gray-800">{user?.nip || `BPR-${user?.id ?? '0000'}`}</p>
-                                    </div>
+                                <div>
+                                    <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">NIP Pegawai</p>
+                                    <p className="text-sm font-bold text-gray-900 mt-0.5">{user?.nip || `BPR-${user?.id ?? '0000'}`}</p>
                                 </div>
-                                <div className="flex items-center gap-3">
-                                    <div className="w-9 h-9 rounded-lg bg-gray-100 flex items-center justify-center">
-                                        <Icon icon="solar:calendar-line-duotone" className="text-gray-500" width={18} />
-                                    </div>
-                                    <div>
-                                        <p className="text-[11px] font-medium text-gray-400 uppercase tracking-wide">Bergabung Sejak</p>
-                                        <p className="text-sm font-semibold text-gray-800">{joinDate}</p>
-                                    </div>
+                            </div>
+
+                            <div className="flex items-center gap-3.5 bg-gray-50/80 rounded-xl p-4 border border-gray-100">
+                                <div className="w-11 h-11 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center shrink-0">
+                                    <Icon icon="solar:calendar-line-duotone" width={22} />
+                                </div>
+                                <div>
+                                    <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Bergabung Sejak</p>
+                                    <p className="text-sm font-bold text-gray-900 mt-0.5">{joinDate}</p>
                                 </div>
                             </div>
                         </div>
@@ -104,27 +102,27 @@ export default function Edit({ mustVerifyEmail, status }) {
 
                     {/* Grid 2 Kolom: Update Profile & Update Password */}
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <div className="bg-white p-4 shadow sm:rounded-lg sm:p-8">
+                        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 sm:p-8">
                             <UpdateProfileInformationForm
                                 mustVerifyEmail={mustVerifyEmail}
                                 status={status}
                             />
                         </div>
 
-                        <div className="bg-white p-4 shadow sm:rounded-lg sm:p-8">
+                        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 sm:p-8">
                             <UpdatePasswordForm />
                         </div>
                     </div>
 
                     {/* Compliance Card */}
-                    <div className="bg-blue-50 border border-blue-200 shadow-sm sm:rounded-lg p-5">
+                    <div className="bg-blue-50/60 border border-blue-100 shadow-sm rounded-2xl p-5">
                         <div className="flex items-start gap-3">
-                            <div className="w-9 h-9 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-                                <Icon icon="solar:info-circle-line-duotone" className="text-blue-600" width={20} />
+                            <div className="w-10 h-10 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                <Icon icon="solar:info-circle-line-duotone" width={20} />
                             </div>
                             <div>
-                                <h4 className="text-sm font-semibold text-blue-900">Kebijakan Akun Institusi</h4>
-                                <p className="text-sm text-blue-800 mt-1 leading-relaxed">
+                                <h4 className="text-sm font-bold text-blue-900">Kebijakan Akun Institusi</h4>
+                                <p className="text-sm text-blue-800/90 mt-1 leading-relaxed">
                                     Akun ini merupakan akun resmi operasional kredit BPR. Perubahan hak akses,
                                     perpindahan cabang, atau penonaktifan akun hanya dapat dilakukan melalui
                                     Administrator Sistem (Unit IT) sesuai SOP Perbankan.

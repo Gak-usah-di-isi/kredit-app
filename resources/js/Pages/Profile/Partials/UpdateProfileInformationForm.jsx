@@ -25,11 +25,11 @@ export default function UpdateProfileInformation({
 
     return (
         <section className={className}>
-            <header>
-                <h2 className="text-lg font-semibold text-gray-900">
+            <header className="pb-4 border-b border-gray-100">
+                <h2 className="text-lg font-bold text-gray-900">
                     Informasi Profil
                 </h2>
-                <p className="mt-1 text-sm text-gray-600">
+                <p className="mt-1 text-sm text-gray-500">
                     Perbarui informasi nama dan alamat email resmi akun Anda.
                 </p>
             </header>
@@ -45,8 +45,9 @@ export default function UpdateProfileInformation({
                         required
                         isFocused
                         autoComplete="name"
+                        placeholder="Masukkan nama lengkap Anda"
                     />
-                    <InputError className="mt-2" message={errors.name} />
+                    <InputError className="mt-1.5" message={errors.name} />
                 </div>
 
                 <div>
@@ -59,8 +60,9 @@ export default function UpdateProfileInformation({
                         onChange={(e) => setData('email', e.target.value)}
                         required
                         autoComplete="username"
+                        placeholder="nama@bpr.co.id"
                     />
-                    <InputError className="mt-2" message={errors.email} />
+                    <InputError className="mt-1.5" message={errors.email} />
                 </div>
 
                 {mustVerifyEmail && user.email_verified_at === null && (
