@@ -34,7 +34,7 @@ export default function KreditAppTopbar({ onMobileMenuClick }) {
 
   return (
     <div
-      className="h-[64px] flex items-center justify-between px-6 flex-shrink-0"
+      className={`${isOutcomeMonitoring ? 'h-14' : 'h-[64px]'} flex flex-shrink-0 items-center justify-between px-3 sm:px-6`}
       style={{ background: bar, borderBottom: `1px solid ${bord}` }}
     >
       {/* Left — mobile hamburger + view selector */}
@@ -169,11 +169,11 @@ export default function KreditAppTopbar({ onMobileMenuClick }) {
               onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
             >
               <div className="hidden md:block text-right">
-                <div className="text-sm font-medium" style={{ color: text }}>{userName}</div>
+                <div className="text-sm font-semibold" style={{ color: text }}>{userName}</div>
                 <div className="text-xs" style={{ color: sub }}>{userRole}</div>
               </div>
               <Avatar className="w-9 h-9">
-                <AvatarFallback className="bg-blue-600 text-white text-sm">{userInitial}</AvatarFallback>
+                <AvatarFallback className="bg-blue-600 text-white text-sm font-semibold">{userInitial}</AvatarFallback>
               </Avatar>
             </button>
           </DropdownMenuTrigger>

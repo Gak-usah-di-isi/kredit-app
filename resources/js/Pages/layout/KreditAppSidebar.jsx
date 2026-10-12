@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Icon } from '@iconify/react';
 import { usePage, router } from '@inertiajs/react';
+import { LockKeyhole, LogOut, Moon, ShieldCheck } from 'lucide-react';
 import SidebarContent from './SidebarItems';
 
 // same palette language as the BADGE map in Pages/Admin/Summary/Index.jsx
@@ -19,8 +20,8 @@ function SidebarBadge({ badge }) {
   const { bg, color } = BADGE_TONES[tone] ?? BADGE_TONES.gray;
   return (
     <span
-      className="flex-shrink-0 text-xs font-semibold rounded-full px-2 py-0.5"
-      style={{ background: bg, color, fontFamily: 'Manrope,sans-serif' }}
+      className="flex-shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold"
+      style={{ background: bg, color }}
     >
       {count}
     </span>
@@ -34,7 +35,7 @@ export default function KreditAppSidebar({
   currentPath,
   items,
 }) {
-  const { logoPath, auth, authUser, authRoles } = usePage().props;
+  const { auth, authUser, authRoles } = usePage().props;
   const userForRole = authUser || auth?.user;
   const rolesForSidebar = authRoles || (userForRole?.roles ? userForRole.roles.map(r => r.name) : []);
 
@@ -82,10 +83,9 @@ export default function KreditAppSidebar({
   const text  = '#374151';
   const sub   = '#6B7280';
   const hover = '#F9FAFB';
-  const activeBg   = '#EFF3FF';
-  const activeText = '#0152EA';
-  const clinicBg   = '#ffffff';
-  const clinicBord = '#e5e7eb';
+  const activeBg   = 'transparent';
+  const activeText = text;
+  const clinicBg   = '#f4f3fc';
 
   const sidebarContent = (
     <>
@@ -130,11 +130,11 @@ export default function KreditAppSidebar({
                 <div key={heading} className="px-4 mb-2 pl-5 pr-4">
                   <button
                     onClick={() => handleSectionToggle(heading)}
-                    className="w-full flex items-center justify-between py-3 rounded-lg px-2 -mx-2 transition-colors pr-1.5 cursor-pointer"
+                    className="w-full flex items-center justify-between py-2 rounded-lg px-2 -mx-2 transition-colors pr-1.5 cursor-pointer"
                     onMouseEnter={e => e.currentTarget.style.background = hover}
                     onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
                   >
-                    <h3 className="font-bold uppercase tracking-wide text-xs" style={{ color: sub }}>
+                    <h3 className="text-[10px] font-semibold uppercase tracking-normal" style={{ color: sub }}>
                       {heading}
                     </h3>
                     <Icon
@@ -144,7 +144,7 @@ export default function KreditAppSidebar({
                   </button>
 
                   {isExpanded && (
-                    <div className="space-y-1 mt-2">
+                    <div className="space-y-1 mt-1.5">
                       {item.children.map((child) => {
                         const isActive = currentPath === child.url;
                         return (
@@ -152,7 +152,7 @@ export default function KreditAppSidebar({
                             key={child.id}
                             href={child.url}
                             onClick={handleItemClick}
-                            className="w-full flex items-center gap-3 px-3 py-2.5 text-sm rounded-lg transition-colors cursor-pointer"
+                            className="w-full flex items-center gap-2 px-3 py-1.5 text-[13px] rounded-lg transition-colors cursor-pointer"
                             style={{
                               background: isActive ? activeBg : 'transparent',
                               color: isActive ? activeText : text,
@@ -164,7 +164,7 @@ export default function KreditAppSidebar({
                             {child.icon && (
                               <Icon
                                 icon={child.icon}
-                                width={20}
+                                width={16}
                                 className="flex-shrink-0"
                                 style={{ color: isActive ? activeText : text }}
                               />
@@ -228,7 +228,7 @@ export default function KreditAppSidebar({
     <>
       {/* Desktop */}
       <div
-        className="hidden lg:flex w-[255px] flex-col h-full"
+        className="hidden lg:flex w-[clamp(184px,18vw,260px)] shrink-0 flex-col h-full"
         style={{ background: bg, borderRight: `1px solid ${bord}` }}
       >
         {sidebarContent}
